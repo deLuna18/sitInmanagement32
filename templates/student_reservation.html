@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="../static/images/ux.png">
+    <title>Reservation Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #F8F5FA; /* Updated background color */
+        }
+
+        /* NAVIGATION BAR */
+        .navbar {
+            width: 100%;
+            background-color: #603A7E; /* Updated primary color */
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .nav-items {
+            display: flex;
+        }
+
+        .navbar .nav-link {
+            color: white;
+            font-weight: bold;
+            margin: 0 10px;
+            text-decoration: none;
+            font-size: 1rem;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background 0.3s ease-in-out;
+        }
+
+        .navbar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* MAIN CONTAINER */
+        .image-container {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .image-container img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+        }
+        .form-container {
+            width: 50%;
+            margin: 30px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #ffffff;
+            border: 1px solid #D6C9E1; /* Updated border color */
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #603A7E; /* Updated section title color */
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #A08BB3; /* Updated secondary color */
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2E1F33; /* Updated text color */
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #D6C9E1; /* Updated border color */
+            border-radius: 5px;
+        }
+        .reserve-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #603A7E; /* Updated primary color */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease-in-out;
+        }
+        .reserve-btn:hover {
+            background-color: #4B2D5E; /* Updated hover color */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar">
+        <a class="nav-link" href="{{ url_for('student_dashboard')}}">Dashboard</a>
+        <div class="nav-items">
+            <a class="nav-link" href="{{ url_for('student_dashboard')}}">Home</a>
+            <a class="nav-link" href="#">Notifications</a>
+            <a class="nav-link" href="{{ url_for('edit_profile') }}">Profile</a>
+            <a class="nav-link" href="{{ url_for('student_history')}}">History</a>
+            <a class="nav-link" href="{{ url_for('student_reservation')}}">Reservation</a>
+            <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+        </div>
+    </nav>
+
+    <!-- RESERVATION FORM CONTAINER -->
+    <div class="image-container">
+        <img src="../static/images/lab.jpg" alt="Reservation Banner">
+    </div>
+    <div class="form-container">
+        <form method="POST" action="{{ url_for('student_reservation') }}">
+            
+            <!-- Personal Information Section -->
+            <div class="section">
+                <div class="section-title">Personal Information</div>
+                <div class="form-group">
+                    <label>ID Number:</label>
+                    <input type="text" name="idno" value="{{ student.idno }}" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Student Name:</label>
+                    <input type="text" value="{{ student.firstname }} {{ student.middlename }} {{ student.lastname }}" disabled>
+                </div>
+            </div>
+
+            <!-- Academic Information Section -->
+            <div class="section">
+                <div class="section-title">Academic Information</div>
+                <div class="form-group">
+                    <label>Course:</label>
+                    <input type="text" name="course" value="{{ student.course }}" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Year Level:</label>
+                    <input type="text" name="year_level" value="{{ student.year_level }}" disabled>
+                </div>
+            </div>
+
+            <!-- Reservation Details Section -->
+            <div class="section">
+                <div class="section-title">Reservation Details</div>
+                <div class="form-group">
+                    <label>Purpose:</label>
+                    <input type="text" name="purpose" placeholder="Enter purpose" required>
+                </div>
+                <div class="form-group">
+                    <label>Lab:</label>
+                    <input type="text" name="lab" placeholder="Enter Lab Number" required>
+                </div>
+                <div class="form-group">
+                    <label>Time In:</label>
+                    <input type="time" name="time_in" required>
+                </div>
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="date" name="date" required>
+                </div>
+            </div>
+
+            <button type="submit" class="reserve-btn">Reserve</button>
+
+        </form>
+    </div>
+
+</body>
+</html>
