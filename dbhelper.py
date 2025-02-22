@@ -94,7 +94,29 @@ def update_student_profile(username: str, firstname: str, middlename: str, lastn
 
 
 # CREATE A STUDENT RESERVATION
-def create_reservation(idno: int, date: str, reason: str, time_in: str) -> bool:
-    sql = "INSERT INTO reservations (student_id, date, reason, time_in) VALUES (?, ?, ?, ?)"
-    return postprocess(sql, (idno, date, reason, time_in))
+def create_reservation(idno: int, student_name: str, course: str, year_level: str, 
+                       purpose: str, lab: str, time_in: str, date: str) -> bool:
+    sql = """INSERT INTO reservations (idno, student_name, course, year_level, 
+                                       purpose, lab, time_in, date) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"""
+    return postprocess(sql, (idno, student_name, course, year_level, purpose, lab, time_in, date))
+
+
+# GET STUDENT HISTORY RESERVATION
+def get_student_reservations_paginated(idno: int, per_page: int, offset: int) -> list:
+    sql = """SELECT idno, student_name, course, year_level, purpose, lab, time_in, date 
+             FROM reservations 
+             WHERE idno = ? 
+             ORDER BY date DESC 
+             LIMIT ? OFFSET ?"""
+    return getprocess(sql, (idno, per_page, offset))
+
+# COUNT FOR PAGINATION
+def count_student_reservations(idno: int) -> int:
+    sql = "SELECT COUNT(*) AS total FROM reservations WHERE idno = ?"
+    result = getprocess(sql, (idno,))
+    
+    if result:  
+        return result[0]["total"] if isinstance(result[0], dict) else result[0][0]  
+    return 0
 

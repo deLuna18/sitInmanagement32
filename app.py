@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, flash, session, make_response, url_for, jsonify
 import dbhelper, os
-from dbhelper import get_student_by_username, update_student_profile, is_idno_exists
+from dbhelper import get_student_by_username, update_student_profile, is_idno_exists, count_student_reservations
 from werkzeug.utils import secure_filename
 from PIL import Image  
 
@@ -325,13 +325,21 @@ def student_reservation():
         return redirect("/student_dashboard")
 
     idno = student.get("idno")  
+    student_name = f"{student.get('firstname')} {student.get('lastname')}"  # Full name
+    course = student.get("course")
+    year_level = student.get("year_level")
 
     if request.method == "POST":
-        date = request.form["date"]
-        reason = request.form["reason"]
-        time_in = request.form["time_in"]
+        purpose = request.form.get("purpose")
+        lab = request.form.get("lab")
+        time_in = request.form.get("time_in")
+        date = request.form.get("date")
 
-        success = dbhelper.create_reservation(idno, date, reason, time_in)
+        if not all([purpose, lab, time_in, date]):  # Ensure all fields are filled
+            flash("Please fill out all fields.", "warning")
+            return redirect("/student_reservation")
+
+        success = dbhelper.create_reservation(idno, student_name, course, year_level, purpose, lab, time_in, date)
 
         if success:
             flash("Reservation successfully submitted!", "success")
@@ -341,10 +349,40 @@ def student_reservation():
 
     return render_template("student_reservation.html", student=student)
 
+
 # HISTORY FOR STUDENT RESERVATION
 @app.route("/student_history")
 def student_history():
-    return render_template("student_history_reservation.html", student_history = student_history)
+    if "user" not in session:
+        flash("Please log in first.", "warning")
+        return redirect("/student_login")
+
+    student = dbhelper.get_student_by_username(session["user"])
+    if not student:
+        flash("User not found!", "danger")
+        return redirect("/student_dashboard")
+
+    idno = student.get("idno")
+
+    # Get page number from request, default to 1
+    page = request.args.get("page", 1, type=int)
+    per_page = 10  # Set items per page
+    offset = (page - 1) * per_page
+
+    reservations = dbhelper.get_student_reservations_paginated(idno, per_page, offset)
+    total_reservations = dbhelper.count_student_reservations(idno)
+
+    total_pages = (total_reservations + per_page - 1) // per_page  # Calculate total pages
+
+    return render_template(
+        "student_history_reservation.html",
+        reservations=reservations,
+        page=page,
+        total_pages=total_pages
+    )
+
+
+
 
 # LOGOUT FOR STUDENTS
 @app.route("/logout")

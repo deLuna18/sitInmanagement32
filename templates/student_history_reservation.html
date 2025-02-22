@@ -117,6 +117,27 @@
         .accent-btn:hover {
             background-color: #e09b0d; /* Darker shade for hover */
         }
+        .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Space between elements */
+    margin-top: 20px;
+}
+
+.pagination-btn {
+    background-color: #603A7E; /* Your primary color */
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.pagination-btn:hover {
+    background-color: #4B2D5E; /* Darker shade on hover */
+}
     </style>
 </head>
 <body>
@@ -147,27 +168,80 @@
         <table>
             <thead>
                 <tr>
-                    <th>ID Number</th>
-                    <th>Name</th>
-                    <th>Sit Purpose</th>
-                    <th>Laboratory</th>
-                    <th>Login</th>
-                    <th>Logout</th>
-                    <th>Date</th>
-                    <th>Action</th>
+                    <th style="text-align: center;">ID Number</th>
+                    <th style="text-align: center;">Name</th>
+                    <th style="text-align: center;">Sit Purpose</th>
+                    <th style="text-align: center;">Laboratory</th>
+                    <th style="text-align: center;">Login</th>
+                    <th style="text-align: center;">Logout</th>
+                    <th style="text-align: center;">Date</th>
+                    <th style="text-align: center;">Action</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td colspan="8" style="text-align: center; color: gray;">No data available</td>
-                </tr>
+                {% if reservations %}
+                    {% for res in reservations %}
+                    <tr>
+                        <td colspan="1" style="text-align: center; color: gray;" >{{ res.idno }}</td>
+                        <td colspan="1" style="text-align: center; color: gray;">{{ res.res_name }}</td>
+                        <td colspan="1" style="text-align: center; color: gray;">{{ res.course }}</td>
+                        <td colspan="1" style="text-align: center; color: gray;">{{ res.year_level }}</td>
+                        <td colspan="1" style="text-align: center; color: gray;">{{ res.purpose }}</td>
+                        <td colspan="1" style="text-align: center; color: gray;">{{ res.lab }}</td>
+                        <td colspan="1" style="text-align: center; color: gray;">{{ res.time_in }}</td>
+                        <td colspan="1" style="text-align: center; color: gray;">{{ res.date }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: gray;">No data available</td>
+                    </tr>
+                {% endif %}
             </tbody>
         </table>
         <div class="pagination">
-            <button class="prev">&lt;</button>
-            <span>1</span>
-            <button class="next">&gt;</button>
+            <button class="pagination-btn prev" onclick="changePage(-1)">&lt; Prev</button>
+            <span id="page-info">Page 1</span>
+            <button class="pagination-btn next" onclick="changePage(1)">Next &gt;</button>
         </div>
+        
+        
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            let page = parseInt(urlParams.get("page")) || 1;
+            const totalPages = parseInt("{{ total_pages|default(1) }}", 10); // Ensures a number
+    
+            console.log("Current Page:", page);
+            console.log("Total Pages:", totalPages);
+    
+            document.getElementById("page-info").textContent = `Page ${page} of ${totalPages}`;
+    
+            // Show/hide Prev button
+            if (page > 1) {
+                document.querySelector(".prev").style.display = "inline-block";
+            }
+    
+            // Show/hide Next button
+            if (page < totalPages) {
+                document.querySelector(".next").style.display = "inline-block";
+            }
+        });
+    
+        function changePage(direction) {
+            const urlParams = new URLSearchParams(window.location.search);
+            let page = parseInt(urlParams.get("page")) || 1;
+            page += direction;
+    
+            if (page < 1 || page > parseInt("{{ total_pages|default(1) }}", 10)) return;  // Prevent invalid pages
+    
+            urlParams.set("page", page);
+            window.location.search = urlParams.toString(); // Reload page with new page number
+        }
+    </script>
+    
+    
 </body>
+
 </html>
