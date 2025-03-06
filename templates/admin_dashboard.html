@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="../static/admin_dashboard.css">
+</head>
+
+<body>
+    <!-- =============== NAVIGATION  ================ -->
+    <div class="container">
+        <div class="navigation">
+            <ul>
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <!-- <ion-icon name="logo-apple"></ion-icon> -->
+                            <ion-icon name="person-circle"></ion-icon>
+                        </span>
+                        <span class="title">Admin</span>
+                    </a>
+                    
+                </li>
+
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="home-outline"></ion-icon>
+                        </span>
+                        <span class="title">Dashboard</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="school-outline"></ion-icon>
+                        </span>
+                        <span class="title">Students</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="person-add-outline"></ion-icon>
+                        </span>
+                        <span class="title">Sit-in</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="documents-outline"></ion-icon>
+                        </span>
+                        <span class="title">View Sit-In Records</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="bar-chart-outline"></ion-icon>
+                        </span>
+                        <span class="title">Sit-in Reports</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+                        </span>
+                        <span class="title">Feedback Reports</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="calendar-outline"></ion-icon>
+                        </span>
+                        <span class="title">Reservation</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('logout') }}">
+                        <span class="icon">
+                            <ion-icon name="log-out-outline"></ion-icon>
+                        </span>
+                        <span class="title">Sign Out</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ========================= Main ==================== -->
+        <div class="main">
+            <div class="topbar">
+                <div class="toggle">
+                    <ion-icon name="menu-outline"></ion-icon>
+                </div>
+
+                <div class="search">
+                    <label>
+                        <input type="text" placeholder="Search here">
+                        <ion-icon name="search-outline"></ion-icon>
+                    </label>
+                </div>
+
+                <div class="user">
+                    <img src="../static/images/customer01.jpg" alt="">
+                </div>
+            </div>
+
+            <!-- ======================= CARDS ================== -->
+            <div class="cardBox">
+                <div class="card">
+                    <div>
+                        <div class="numbers">250</div>
+                        <div class="cardName">Total Students</div>
+                    </div>
+
+                    <div class="iconBx">
+                        <ion-icon name="school-outline"></ion-icon>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div>
+                        <div class="numbers">80</div>
+                        <div class="cardName">Sit-in Requests</div>
+                    </div>
+
+                    <div class="iconBx">
+                        <ion-icon name="person-add-outline"></ion-icon>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div>
+                        <div class="numbers">15</div>
+                        <div class="cardName">Pending Feedbacks</div>
+                    </div>
+
+                    <div class="iconBx">
+                        <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div>
+                        <div class="numbers">12</div>
+                        <div class="cardName">Upcoming Reservations</div>
+                    </div>
+
+                    <div class="iconBx">
+                        <ion-icon name="calendar-outline"></ion-icon>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================ REPORTS ================= -->
+            <div class="details">
+                <div class="recentOrders">
+                    <!-- PLEASE PROVIDE A REPORT IN HERE  -->
+                    <div class="cardHeader">
+                        <h2>Sit-in Reports</h2>
+                    </div>
+                    <canvas id="sitInChart"></canvas>
+                </div>
+
+                <!-- ================= ANNOUNCEMENT ================ -->
+                <div class="recentCustomers">
+                    <div class="cardHeader">
+                        <h2> Announcement</h2>
+                    </div>
+
+                    <textarea id="announcementText" placeholder="New Announcement" style="width: 100%; height: 60px; padding: 10px; margin-top: 10px; border-radius: 5px; border: 1px solid #ccc;"></textarea>
+                    <button onclick="postAnnouncement()" style="background: green; color: white; padding: 10px; border: none; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 5px;">Submit</button>
+
+                    <h3>Posted Announcements</h3>
+                    <div id="announcementList">
+                        <!-- Announcements will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========== Scripts =========  -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // add hovered class to selected list item
+        let list = document.querySelectorAll(".navigation li");
+
+        function activeLink() {
+        list.forEach((item) => {
+            item.classList.remove("hovered");
+        });
+        this.classList.add("hovered");
+        }
+
+        list.forEach((item) => item.addEventListener("mouseover", activeLink));
+
+        // Menu Toggle
+        let toggle = document.querySelector(".toggle");
+        let navigation = document.querySelector(".navigation");
+        let main = document.querySelector(".main");
+
+        toggle.onclick = function () {
+        navigation.classList.toggle("active");
+        main.classList.toggle("active");
+        };
+
+
+        // REPORT
+        document.addEventListener("DOMContentLoaded", function() {
+            let ctx = document.getElementById('sitInChart').getContext('2d');
+            let sitInChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['C', 'Java', 'PHP', 'Python', 'JavaScript', 'C#', 'HTML/CSS', 'SQL', 'MySQL', 'Perl', 'TypeScript', 'Others'],
+                    datasets: [{
+                        label: 'Number of Students',
+                        data: [12, 19, 7, 10, 15, 5, 8, 14, 6, 9, 20, 13],
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#4CAF50', '#8E44AD', '#E74C3C', '#3498DB', '#F1C40F', '#2ECC71', '#D35400', '#34495E', '#1ABC9C', '#95A5A6'],
+                        borderColor: '#ddd',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+
+        // ANNOUNCMENT
+
+        function postAnnouncement() {
+            let text = document.getElementById("announcementText").value.trim();
+            if (text === "") {
+                alert("Please enter an announcement.");
+                return;
+            }
+
+            let now = new Date();
+            let dateString = now.getFullYear() + "-" + now.toLocaleString('en-US', { month: 'short' }) + "-" + now.getDate();
+
+            let announcementDiv = document.createElement("div");
+            announcementDiv.classList.add("announcement-item");
+            announcementDiv.style.background = "white";
+            announcementDiv.style.padding = "10px";
+            announcementDiv.style.border = "1px solid #ddd";
+            announcementDiv.style.marginTop = "10px";
+            announcementDiv.style.borderRadius = "5px";
+            announcementDiv.innerHTML = `<strong>CCS Admin | ${dateString}</strong><p>${text}</p>`;
+
+            document.getElementById("announcementList").prepend(announcementDiv);
+            document.getElementById("announcementText").value = "";
+        }
+
+    </script>
+
+    <!-- ====== ionicons ======= -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+
+</html>

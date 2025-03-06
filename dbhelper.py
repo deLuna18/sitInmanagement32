@@ -120,3 +120,8 @@ def count_student_reservations(idno: int) -> int:
         return result[0]["total"] if isinstance(result[0], dict) else result[0][0]  
     return 0
 
+# CHECK IF USER IS ADMIN
+def is_admin(username: str) -> bool:
+    sql = "SELECT is_admin FROM users WHERE username = ?"
+    result = getprocess(sql, (username,))
+    return result[0]["is_admin"] == 1 if result else False

@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <!-- ======= Styles ====== -->
-    <link rel="stylesheet" href="../static/staff_dashboard.css">
+    <link rel="stylesheet" href="../static/example.css">
 </head>
 
 <body>
-    <!-- =============== Navigation ================ -->
+    <!-- =============== NAVIGATION  ================ -->
     <div class="container">
         <div class="navigation">
             <ul>
@@ -19,7 +17,7 @@
                     <a href="#">
                         <span class="icon">
                             <!-- <ion-icon name="logo-apple"></ion-icon> -->
-                            <ion-icon name="shield-checkmark"></ion-icon>
+                            <ion-icon name="person-circle"></ion-icon>
                         </span>
                         <span class="title">Admin</span>
                     </a>
@@ -90,7 +88,7 @@
                 </li>
 
                 <li>
-                    <a href="#">
+                    <a href="{{ url_for('logout') }}">
                         <span class="icon">
                             <ion-icon name="log-out-outline"></ion-icon>
                         </span>
@@ -169,79 +167,11 @@
             <!-- ================ Order Details List ================= -->
             <div class="details">
                 <div class="recentOrders">
+                    <!-- PLEASE PROVIDE A REPORT IN HERE  -->
                     <div class="cardHeader">
-                        <h2>REPORTS (CHURVA SANI)</h2>
-                        <a href="#" class="btn">View All</a>
+                        <h2>Sit-in Reports</h2>
                     </div>
-
-                    <table>
-                        <thead>
-                            <tr>
-                                <td>Name</td>
-                                <td>Price</td>
-                                <td>Payment</td>
-                                <td>Status</td>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <tr>
-                                <td>Star Refrigerator</td>
-                                <td>$1200</td>
-                                <td>Paid</td>
-                                <td><span class="status delivered">Delivered</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>Dell Laptop</td>
-                                <td>$110</td>
-                                <td>Due</td>
-                                <td><span class="status pending">Pending</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>Apple Watch</td>
-                                <td>$1200</td>
-                                <td>Paid</td>
-                                <td><span class="status return">Return</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>Addidas Shoes</td>
-                                <td>$620</td>
-                                <td>Due</td>
-                                <td><span class="status inProgress">In Progress</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>Star Refrigerator</td>
-                                <td>$1200</td>
-                                <td>Paid</td>
-                                <td><span class="status delivered">Delivered</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>Dell Laptop</td>
-                                <td>$110</td>
-                                <td>Due</td>
-                                <td><span class="status pending">Pending</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>Apple Watch</td>
-                                <td>$1200</td>
-                                <td>Paid</td>
-                                <td><span class="status return">Return</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>Addidas Shoes</td>
-                                <td>$620</td>
-                                <td>Due</td>
-                                <td><span class="status inProgress">In Progress</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <canvas id="sitInChart"></canvas>
                 </div>
 
                 <!-- ================= New Customers ================ -->
@@ -329,6 +259,7 @@
     </div>
 
     <!-- =========== Scripts =========  -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // add hovered class to selected list item
         let list = document.querySelectorAll(".navigation li");
@@ -351,6 +282,33 @@
         navigation.classList.toggle("active");
         main.classList.toggle("active");
         };
+
+
+        // REPORT
+        document.addEventListener("DOMContentLoaded", function() {
+            let ctx = document.getElementById('sitInChart').getContext('2d');
+            let sitInChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['C', 'Java', 'PHP', 'Python', 'JavaScript', 'Ruby', 'Swift', 'C#', 'Go', 'Kotlin', 'HTML/CSS', 'SQL', 'R', 'Perl', 'TypeScript', 'Others'],
+                    datasets: [{
+                        label: 'Number of Students',
+                        data: [12, 19, 7, 10, 15, 5, 8, 14, 6, 9, 20, 13, 4, 3, 11, 7],
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#4CAF50', '#8E44AD', '#E74C3C', '#3498DB', '#F1C40F', '#2ECC71', '#D35400', '#34495E', '#1ABC9C', '#95A5A6'],
+                        borderColor: '#ddd',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
     </script>
 
     <!-- ====== ionicons ======= -->

@@ -36,44 +36,58 @@ def disable_cache(response):
 
 # =============== STUDENT AREA ===================== STUDENT AREA ======================= STUDENT AREA ============= STUDENT AREA ===============
 
+# CHECK IF THE USER IS AN ADMIN OR A STUDENT
 @app.route("/")
 def home():
     if "user" in session:
+        if dbhelper.is_admin(session["user"]):  
+            return redirect("/admin_dashboard")
         return redirect("/student_dashboard")
-    return redirect("/student_login")
+    return redirect("/login")
 
-# LOGIN STUDENT
-@app.route("/student_login", methods=["GET", "POST"])
-def student_login():
-    # Check if "Remember Me" cookie is set
+
+# LOGIN FOR STUDENT AND ADMIN
+@app.route("/login", methods=["GET", "POST"])
+def login():
     username_cookie = request.cookies.get("username")
     if username_cookie:
         session["user"] = username_cookie
+        session["role"] = "admin" if dbhelper.is_admin(username_cookie) else "student"  # Store role
+
+        if session["role"] == "admin":
+            return redirect("/admin_dashboard")
         return redirect("/student_dashboard")
 
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-        remember_me = request.form.get("remember_me")  # Check if "Remember Me" is checked
+        remember_me = request.form.get("remember_me")
+
         user = dbhelper.get_username(username)
 
         if user and user[0]["password"] == password:
             session["user"] = username
             session["idno"] = user[0]["idno"]
             session["logged_in"] = True
-            flash("Login successful!", "success")
+            session["role"] = "admin" if dbhelper.is_admin(username) else "student"  # Store role
 
-            # Set a cookie if "Remember Me" is checked
+            # REDIRECT ADMIN TO ADMIN DASHBOARD 
+            if session["role"] == "admin":
+                flash("Admin login successful!", "success")
+                return redirect("/admin_dashboard")
+
+            # REDIRECT STUDENTS TO STUDENTS DASHBOARD 
+            flash("Login successful!", "success")
             if remember_me:
                 resp = make_response(redirect("/student_dashboard"))
-                resp.set_cookie("username", username, max_age=30*24*60*60, path='/')  # Cookie expires in 30 days
+                resp.set_cookie("username", username, max_age=30*24*60*60, path='/')  # 30 days
                 return resp
+
             return redirect("/student_dashboard")
 
         flash("Invalid username or password.", "danger")
-        return redirect("/student_login")
 
-    return render_template("student_login.html")
+    return render_template("login.html")
 
 # FORGOT PASSWORD
 @app.route('/forgot-password', methods=['POST'])
@@ -114,7 +128,7 @@ def forgot_password():
     except Exception as e:
         flash(f'Error sending email: {str(e)}', 'danger')
 
-    return redirect(url_for('student_login', forgot_password=True))
+    return redirect(url_for('login', forgot_password=True))
 
 
 # REGISTRATION
@@ -141,42 +155,27 @@ def student_register():
 
         if success:
             flash("Registration successful! Please login.", "success")
-            return redirect("/student_login")
+            return redirect("/login")
         else:
             flash("Username already exists. Please try again with a different username.", "danger")
 
     return render_template("student_register.html")
 
-# STUDENT DASBOARD
-# @app.route("/student_dashboard")
-# def student_dashboard():
-#     if "user" not in session:
-#         flash("Please log in first.", "warning")
-#         return redirect("/student_login")
-    
-#     student_info = dbhelper.get_student_by_username(session["user"])
 
-#     if not student_info:
-#         flash("User not found!", "danger")
-#         return redirect("/student_login")
 
-#     # print("Student Info from DB:", student_info) 
-#     session["student_info"] = student_info  
-    
-#     return render_template("student_dashboard.html", student=student_info)
 
 # STUDENT DASHBOARD
 @app.route("/student_dashboard")
 def student_dashboard():
     if "user" not in session:
         flash("Please log in first.", "warning")
-        return redirect("/student_login")
+        return redirect("/login")
 
     student_info = dbhelper.get_student_by_username(session["user"])
 
     if not student_info:
         flash("User not found!", "danger")
-        return redirect("/student_login")
+        return redirect("/login")
 
     session["student_info"] = student_info  
     return render_template("student_dashboard.html", student=student_info)
@@ -219,12 +218,12 @@ def edit_profile():
     username = session.get('user')  
     if not username:
         flash("Please log in first.", "warning")
-        return redirect(url_for('student_login'))  
+        return redirect(url_for('login'))  
 
     student = get_student_by_username(username)
     if not student:
         flash("User not found!", "danger")
-        return redirect(url_for('student_login'))
+        return redirect(url_for('login'))
 
     if request.method == 'POST':
         firstname = request.form.get('firstname', '')
@@ -316,7 +315,7 @@ def save_profile():
 def student_reservation():
     if "user" not in session:
         flash("Please log in first.", "warning")
-        return redirect("/student_login")
+        return redirect("/login")
 
     student = dbhelper.get_student_by_username(session["user"])
 
@@ -355,7 +354,7 @@ def student_reservation():
 def student_history():
     if "user" not in session:
         flash("Please log in first.", "warning")
-        return redirect("/student_login")
+        return redirect("/login")
 
     student = dbhelper.get_student_by_username(session["user"])
     if not student:
@@ -382,28 +381,32 @@ def student_history():
     )
 
 
-
-
-# LOGOUT FOR STUDENTS
+# LOGOUT FOR STUDENTS AND ADMIN
 @app.route("/logout")
 def logout():
-    session.clear()
-    resp = make_response(redirect("/student_login"))
-    resp.delete_cookie("username")  # Delete the "Remember Me" cookie
+    session.clear()  # Clears all session data
+    resp = make_response(redirect("/login"))  # Default redirect to student login
+    resp.delete_cookie("username")  # Remove stored username
+
+    # Check if the user is an admin
+    if session.get("role") == "admin":  
+        resp = make_response(redirect("/admin_login"))  # Redirect admins to the admin login page
+
     flash("You have been logged out.", "success")
     return resp
 
 
 
-# =============== STAFF AREA ===================== STAFF AREA ======================= STAFF AREA ============= STAFF AREA ===============
-# STAFF DASHBOARD
-@app.route("/staff_dashboard")
-def staff_dashboard():
-    if "user" not in session:
-        flash("Please log in first.", "warning")
-        return redirect("/student_login")
-    staff_list = dbhelper.get_all_staff()
-    return render_template("staff_dashboard.html", username=session["user"], staff_list=staff_list)
+
+# =============== ADMIN AREA ===================== ADMIN AREA ======================= ADMIN AREA ============= ADMIN AREA ===============
+
+# ADMIN DASHBOARD
+@app.route("/admin_dashboard")
+def admin_dashboard():
+    if "user" not in session or not dbhelper.is_admin(session["user"]):
+        return redirect("/login")
+    return render_template("admin_dashboard.html")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
