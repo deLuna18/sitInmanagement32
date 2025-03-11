@@ -225,6 +225,15 @@
         display: none; 
     }
 
+    .announcements .card-body {
+        overflow-y: auto;
+        scrollbar-width: none; 
+    }
+
+    .announcements .card-body::-webkit-scrollbar {
+        display: none;  
+    }
+
     @media (max-width: 1024px) {
         .student-info,
         .announcements,
@@ -396,8 +405,6 @@
                  Student Information
             </div>
             <div class="card-body text-start p-4" style="text-align: center;">
-                <!-- <img src="{{ url_for('static', filename='uploads/' + (student.profile_picture or 'profile_picture.png')) }}" alt="Profile Picture" width="150" height="150"> -->
-
                 <div class="profile-pic-container">
                     <img id="profile-pic" class="profile-pic" 
                          src="{{ url_for('static', filename='uploads/' + (student.profile_picture if student.profile_picture else 'def.png')) }}" 
@@ -416,13 +423,17 @@
         
 
         <div class="card announcements" style="height: 70vh;">
-            <div class="card-header">Announcement</div>
+            <div class="card-header">Announcements</div>
             <div class="card-body">
-                <h5>CCS Admin | 2025-Feb-03</h5>
-                <p>The College of Computer Studies will open the registration of students for the Sit-in privilege starting tomorrow. Thank you! Lab Supervisor</p>
-                <hr>
-                <h5>CCS Admin | 2024-May-08</h5>
-                <p>Important Announcement: We are excited to announce the launch of our new website! 🎉 Explore our latest products and services now!</p>
+                {% if announcements %}
+                    {% for ann in announcements %}
+                        <h5>CCS Admin | {{ ann.date_posted[:10] }}</h5>
+                        <p>{{ ann.content }}</p>
+                        <hr>
+                    {% endfor %}
+                {% else %}
+                    <p>No announcements available.</p>
+                {% endif %}
             </div>
         </div>
 

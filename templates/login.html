@@ -118,7 +118,6 @@
             }, 3000); 
         });
 
-        // Function to check if user details are saved
         document.addEventListener("DOMContentLoaded", function () {
             if (localStorage.getItem("rememberMe") === "true") {
                 document.getElementById("email").value = localStorage.getItem("email");
@@ -126,7 +125,6 @@
             }
         });
 
-        // Handle form submission
         document.getElementById("loginForm").addEventListener("submit", function (event) {
             event.preventDefault(); // Prevent actual form submission
 
@@ -141,7 +139,6 @@
                 localStorage.setItem("rememberMe", "false");
             }
 
-            // Continue with your login process (AJAX request or form submission)
             alert("Login submitted! Implement actual authentication.");
         });
 

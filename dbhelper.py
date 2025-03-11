@@ -1,4 +1,6 @@
 from sqlite3 import connect,Row
+import datetime
+import pytz
 
 database:str = 'usermanagement.db'
 
@@ -125,3 +127,34 @@ def is_admin(username: str) -> bool:
     sql = "SELECT is_admin FROM users WHERE username = ?"
     result = getprocess(sql, (username,))
     return result[0]["is_admin"] == 1 if result else False
+
+# GET ALL REGISTERED STUDENT EMAILS
+def get_all_student_emails() -> list:
+    sql = "SELECT email_address FROM users"
+    student_emails = getprocess(sql)
+    
+    return [student["email_address"] for student in student_emails if student["email_address"]]
+
+# ANNOUNCEMENTS 
+def add_announcement(title: str, content: str) -> bool:
+    # Set timezone to Philippine Time (Asia/Manila)
+    local_timezone = pytz.timezone("Asia/Manila")
+    date_posted = datetime.datetime.now(local_timezone).strftime('%Y-%m-%d %H:%M:%S')
+
+    sql = "INSERT INTO announcements (title, content, date_posted) VALUES (?, ?, ?)"
+    return postprocess(sql, (title, content, date_posted))
+
+# GET ANNOUNCEMENT 
+def get_announcements() -> list:
+    sql = "SELECT id, title, content, date_posted FROM announcements ORDER BY date_posted DESC, id DESC"
+    return getprocess(sql)
+
+# DELETE ANNOUNCEMENT
+def delete_announcement(announcement_id: int) -> bool:
+    sql = "DELETE FROM announcements WHERE id = ?"
+    return postprocess(sql, (announcement_id,))
+
+# EDIT ANNOUNCEMENT 
+def update_announcement(announcement_id: int, new_content: str) -> bool:
+    sql = "UPDATE announcements SET content = ? WHERE id = ?"
+    return postprocess(sql, (new_content, announcement_id))

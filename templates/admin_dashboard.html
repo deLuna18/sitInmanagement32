@@ -1,279 +1,391 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+	<meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="../static/admin_dashboard.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+
+	
 </head>
-
 <body>
-    <!-- =============== NAVIGATION  ================ -->
-    <div class="container">
-        <div class="navigation">
-            <ul>
-                <li>
-                    <a href="#">
-                        <span class="icon">
-                            <!-- <ion-icon name="logo-apple"></ion-icon> -->
-                            <ion-icon name="person-circle"></ion-icon>
-                        </span>
-                        <span class="title">Admin</span>
-                    </a>
-                    
-                </li>
-
-                <li>
-                    <a href="#">
-                        <span class="icon">
-                            <ion-icon name="home-outline"></ion-icon>
-                        </span>
-                        <span class="title">Dashboard</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#">
-                        <span class="icon">
-                            <ion-icon name="school-outline"></ion-icon>
-                        </span>
-                        <span class="title">Students</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#">
-                        <span class="icon">
-                            <ion-icon name="person-add-outline"></ion-icon>
-                        </span>
-                        <span class="title">Sit-in</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#">
-                        <span class="icon">
-                            <ion-icon name="documents-outline"></ion-icon>
-                        </span>
-                        <span class="title">View Sit-In Records</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#">
-                        <span class="icon">
-                            <ion-icon name="bar-chart-outline"></ion-icon>
-                        </span>
-                        <span class="title">Sit-in Reports</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#">
-                        <span class="icon">
-                            <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
-                        </span>
-                        <span class="title">Feedback Reports</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#">
-                        <span class="icon">
-                            <ion-icon name="calendar-outline"></ion-icon>
-                        </span>
-                        <span class="title">Reservation</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ url_for('logout') }}">
-                        <span class="icon">
-                            <ion-icon name="log-out-outline"></ion-icon>
-                        </span>
-                        <span class="title">Sign Out</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <!-- ========================= Main ==================== -->
-        <div class="main">
-            <div class="topbar">
-                <div class="toggle">
-                    <ion-icon name="menu-outline"></ion-icon>
-                </div>
-
-                <div class="search">
-                    <label>
-                        <input type="text" placeholder="Search here">
-                        <ion-icon name="search-outline"></ion-icon>
-                    </label>
-                </div>
-
-                <div class="user">
-                    <img src="../static/images/customer01.jpg" alt="">
-                </div>
-            </div>
-
-            <!-- ======================= CARDS ================== -->
-            <div class="cardBox">
-                <div class="card">
-                    <div>
-                        <div class="numbers">250</div>
-                        <div class="cardName">Total Students</div>
-                    </div>
-
-                    <div class="iconBx">
+	<!-- SIDEBAR -->
+	<section id="sidebar">
+		<a href="#" class="brand"><i class='bx bx-user icon'></i> Admin </a>
+		<ul class="side-menu">
+			<li><a href="#" class="active"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
+			<li class="divider" data-text="main">Main</li>
+			<li>
+				<a href="#">
+                    <span class="icon">
+                        <ion-icon name="home-outline"></ion-icon>
+                    </span>
+                    <span class="title">Dashboard</span>
+                </a>
+			</li>
+			<li>
+                <a href="#">
+                    <span class="icon">
                         <ion-icon name="school-outline"></ion-icon>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div>
-                        <div class="numbers">80</div>
-                        <div class="cardName">Sit-in Requests</div>
-                    </div>
-
-                    <div class="iconBx">
+                    </span>
+                    <span class="title">Students</span>
+                </a>
+            </li>
+			<li>
+                <a href="#">
+                    <span class="icon">
                         <ion-icon name="person-add-outline"></ion-icon>
-                    </div>
-                </div>
+                    </span>
+                    <span class="title">Sit-in</span>
+                </a>
+            </li>
+			<li class="divider" data-text="Reports">Reports</li>
+			<li>
+                <a href="#">
+                    <span class="icon">
+                        <ion-icon name="documents-outline"></ion-icon>
+                    </span>
+                    <span class="title">View Sit-In Records</span>
+                </a>
+            </li>
+			<li>
+				<a href="#">
+                    <span class="icon">
+                        <ion-icon name="bar-chart-outline"></ion-icon>
+                    </span>
+                    <span class="title">Sit-in Reports</span>
+                </a>
+			</li>
 
-                <div class="card">
-                    <div>
-                        <div class="numbers">15</div>
-                        <div class="cardName">Pending Feedbacks</div>
-                    </div>
-
-                    <div class="iconBx">
+            <li>
+                <a href="#">
+                    <span class="icon">
                         <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
-                    </div>
-                </div>
+                    </span>
+                    <span class="title">Feedback Reports</span>
+                </a>
+            </li>
 
-                <div class="card">
-                    <div>
-                        <div class="numbers">12</div>
-                        <div class="cardName">Upcoming Reservations</div>
-                    </div>
-
-                    <div class="iconBx">
+            <li>
+                <a href="#">
+                    <span class="icon">
                         <ion-icon name="calendar-outline"></ion-icon>
-                    </div>
-                </div>
-            </div>
+                    </span>
+                    <span class="title">Reservation</span>
+                </a>
+            </li>
 
-            <!-- ================ REPORTS ================= -->
-            <div class="details">
-                <div class="recentOrders">
-                    <!-- PLEASE PROVIDE A REPORT IN HERE  -->
-                    <div class="cardHeader">
-                        <h2>Sit-in Reports</h2>
-                    </div>
-                    <canvas id="sitInChart"></canvas>
-                </div>
+            <li>
+                <a href="{{ url_for('logout') }}">
+                    <span class="icon">
+                        <ion-icon name="log-out-outline"></ion-icon>
+                    </span>
+                    <span class="title">Sign Out</span>
+                </a>
+            </li>
+		</ul>
+		<!-- <div class="ads">
+			<div class="wrapper">
+				<a href="#" class="btn-upgrade">Upgrade</a>
+				<p>Become a <span>PRO</span> member and enjoy <span>All Features</span></p>
+			</div>
+		</div> -->
+	</section>
+	<!-- SIDEBAR -->
 
-                <!-- ================= ANNOUNCEMENT ================ -->
-                <div class="recentCustomers">
-                    <div class="cardHeader">
-                        <h2> Announcement</h2>
-                    </div>
+	<!-- NAVBAR -->
+	<section id="content">
+		<!-- NAVBAR -->
+		<nav>
+			<i class='bx bx-menu toggle-sidebar' ></i>
+			<form action="#">
+				<div class="form-group">
+					<input type="text" placeholder="Search...">
+					<i class='bx bx-search icon' ></i>
+				</div>
+			</form>
+			<a href="#" class="nav-link">
+				<i class='bx bxs-bell icon' ></i>
+				<span class="badge">5</span>
+			</a>
+			<a href="#" class="nav-link">
+				<i class='bx bxs-message-square-dots icon' ></i>
+				<span class="badge">8</span>
+			</a>
+			<span class="divider"></span>
+			<div class="profile">
+				<img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8cGVvcGxlfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="">
+				<ul class="profile-link">
+					<li><a href="#"><i class='bx bxs-user-circle icon' ></i> Profile</a></li>
+					<li><a href="#"><i class='bx bxs-cog' ></i> Settings</a></li>
+					<li><a href="#"><i class='bx bxs-log-out-circle' ></i> Logout</a></li>
+				</ul>
+			</div>
+		</nav>
+		<!-- NAVBAR -->
 
-                    <textarea id="announcementText" placeholder="New Announcement" style="width: 100%; height: 60px; padding: 10px; margin-top: 10px; border-radius: 5px; border: 1px solid #ccc;"></textarea>
-                    <button onclick="postAnnouncement()" style="background: green; color: white; padding: 10px; border: none; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 5px;">Submit</button>
+		<!-- MAIN -->
+		<main>
+			<h1 class="title">Dashboard</h1>
+			<ul class="breadcrumbs">
+				<li><a href="#">Home</a></li>
+				<li class="divider">/</li>
+				<li><a href="#" class="active">Dashboard</a></li>
+			</ul>
+			<div class="info-data">
+				<div class="card">
+					<div class="head">
+						<div>
+							<h2>200</h2>
+							<p>Total Students</p>
+						</div>
+						<!-- <i class='bx bx-trending-up icon' ></i> -->
+                        <div class="iconBx">
+                            <ion-icon name="school-outline"></ion-icon>
+                        </div>
+					</div>
+					<span class="progress" data-value="40%"></span>
+					<span class="label">40%</span>
+				</div>
+				<div class="card">
+					<div class="head">
+						<div>
+							<h2>234</h2>
+							<p>Sit-in Requests</p>
+						</div>
+						<!-- <i class='bx bx-trending-down icon down' ></i> -->
+                        <div class="iconBx">
+                            <ion-icon name="person-add-outline"></ion-icon>
+                        </div>
+					</div>
+					<span class="progress" data-value="60%"></span>
+					<span class="label">60%</span>
+				</div>
+				<div class="card">
+					<div class="head">
+						<div>
+							<h2>465</h2>
+							<p>Pending Feedbacks</p>
+						</div>
+						<!-- <i class='bx bx-trending-up icon' ></i> -->
+                        <div class="iconBx">
+                            <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+                        </div>
+					</div>
+					<span class="progress" data-value="30%"></span>
+					<span class="label">30%</span>
+				</div>
+				<div class="card">
+					<div class="head">
+						<div>
+							<h2>235</h2>
+							<p>Upcoming Reservation</p>
+						</div>
+						<!-- <i class='bx bx-trending-up icon' ></i> -->
+                        <div class="iconBx">
+                            <ion-icon name="calendar-outline"></ion-icon>
+                        </div>
+					</div>
+					<span class="progress" data-value="80%"></span>
+					<span class="label">80%</span>
+				</div>
+			</div>
+			<div class="data">
+				<div class="content-data">
+					<div class="head">
+						<h3>REPORT</h3>
+						<div class="menu">
+							<i class='bx bx-dots-horizontal-rounded icon'></i>
+							<ul class="menu-link">
+								<li><a href="#">Edit</a></li>
+								<li><a href="#">Save</a></li>
+								<li><a href="#">Remove</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="chart">
+						<div id="chart"></div>
+					</div>
+				</div>
 
-                    <h3>Posted Announcements</h3>
-                    <div id="announcementList">
-                        <!-- Announcements will be displayed here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+				<div class="content-data">
+					<!-- Announcement Header -->
+					<div class="head">
+						<h3><i class="fas fa-bullhorn"></i> ANNOUNCEMENTS</h3>
+						<button id="openModal" class="btn btn-add"><i class="fas fa-plus-circle"></i> Add Announcement</button>
+					</div>
 
-    <!-- =========== Scripts =========  -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // add hovered class to selected list item
-        let list = document.querySelectorAll(".navigation li");
+					<!-- Announcement List -->
+					<div id="announcementList" style="max-height: 400px; overflow-y: auto;">
+						<table id="announcementTable" class="announcement-table">
+							<thead>
+								<tr>
+									<th style="text-align: center;">Title</th>
+									<th style="text-align: center;">Date Created</th>
+									<th style="text-align: center;">Action</th>
+								</tr>
+							</thead>
+							<tbody id="announcementBody" style="text-align: center;">
+								{% if announcements %}
+									{% for ann in announcements %}
+										<tr id="announcementRow-{{ ann.id }}"  class="announcement-row" data-id="{{ ann.id }}" data-title="{{ ann.title }}" data-content="{{ ann.content }}"  data-date-posted="{{ ann.date_posted }}" style="text-align: center; cursor: pointer;">
+											<td style="text-align: center;">{{ ann.title }}</td>
+											<td style="text-align: center;">{{ ann.date_posted[:10] }}</td>
+											<td style="text-align: center;">
+												<button class="btn-icon edit-btn" onclick="event.stopPropagation();  editAnnouncement('{{ ann.id }}')">
+													<i class="fas fa-edit"></i>
+												</button>
+												<button class="btn-icon delete-btn" onclick="event.stopPropagation(); deleteAnnouncement('{{ ann.id }}')">
+													<i class="fas fa-trash"></i>
+												</button>
+												
+											</td>
+										</tr>
+									{% endfor %}
+								{% else %}
+									<tr>
+										<td colspan="3">No announcements available.</td>
+									</tr>
+								{% endif %}
+							</tbody>
+						</table>
+					</div>	
+				</div>
 
-        function activeLink() {
-        list.forEach((item) => {
-            item.classList.remove("hovered");
-        });
-        this.classList.add("hovered");
-        }
+				<!-- EDIT ANNOUNCEMENT -->
+				<div id="announ_cusModal" 
+					style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 9999;">
+				
+				<div class="announ_cus-content" 
+						style="
+						background: #ffffff; 
+						width: 100%; 
+						max-width: 420px; 
+						margin: 10% auto; 
+						padding: 30px; 
+						border-radius: 12px; 
+						box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); 
+						text-align: center; 
+						position: relative;">
+							
+					<span class="announ_cus-close-btn" 
+							style="
+							color: #5F3B71; 
+							position: absolute; 
+							top: 12px; 
+							right: 15px; 
+							font-size: 28px; 
+							cursor: pointer;">
+						&times;
+					</span>
+			
+					<h2 style="
+						color: #5F3B71; 
+						margin-bottom: 20px; 
+						font-size: 22px; 
+						font-weight: 600;">
+						Edit Announcement
+					</h2>
+			
+					<form id="announ_cusForm">
+						<label for="announ_cusContent" style="
+							display: block; 
+							text-align: left; 
+							font-weight: 500; 
+							margin-bottom: 8px;">
+							Announcement Content:
+						</label>
+			
+						<textarea id="announ_cusContent" 
+							rows="5" 
+							placeholder="Enter updated announcement details..." 
+							required 
+							style="
+							width: 100%; 
+							padding: 10px; 
+							border: 2px solid #5F3B71; 
+							border-radius: 8px; 
+							resize: none; 
+							text-align: left; 
+							font-size: 14px;">
+						</textarea>
+						
+						<button type="submit" 
+								class="announ_cus-btn-save"
+								style="
+									background-color: #5F3B71; 
+									color: #fff; 
+									border: none; 
+									width: 100%; 
+									padding: 12px 0; 
+									margin-top: 15px; 
+									border-radius: 8px; 
+									font-weight: 500; 
+									cursor: pointer;
+									transition: background 0.3s ease;">
+							Save Changes
+						</button>
+					</form>
+				</div>
+			</div>
 
-        list.forEach((item) => item.addEventListener("mouseover", activeLink));
-
-        // Menu Toggle
-        let toggle = document.querySelector(".toggle");
-        let navigation = document.querySelector(".navigation");
-        let main = document.querySelector(".main");
-
-        toggle.onclick = function () {
-        navigation.classList.toggle("active");
-        main.classList.toggle("active");
-        };
 
 
-        // REPORT
-        document.addEventListener("DOMContentLoaded", function() {
-            let ctx = document.getElementById('sitInChart').getContext('2d');
-            let sitInChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['C', 'Java', 'PHP', 'Python', 'JavaScript', 'C#', 'HTML/CSS', 'SQL', 'MySQL', 'Perl', 'TypeScript', 'Others'],
-                    datasets: [{
-                        label: 'Number of Students',
-                        data: [12, 19, 7, 10, 15, 5, 8, 14, 6, 9, 20, 13],
-                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#4CAF50', '#8E44AD', '#E74C3C', '#3498DB', '#F1C40F', '#2ECC71', '#D35400', '#34495E', '#1ABC9C', '#95A5A6'],
-                        borderColor: '#ddd',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        });
+				
+				</div>
 
-        // ANNOUNCMENT
-
-        function postAnnouncement() {
-            let text = document.getElementById("announcementText").value.trim();
-            if (text === "") {
-                alert("Please enter an announcement.");
-                return;
-            }
-
-            let now = new Date();
-            let dateString = now.getFullYear() + "-" + now.toLocaleString('en-US', { month: 'short' }) + "-" + now.getDate();
-
-            let announcementDiv = document.createElement("div");
-            announcementDiv.classList.add("announcement-item");
-            announcementDiv.style.background = "white";
-            announcementDiv.style.padding = "10px";
-            announcementDiv.style.border = "1px solid #ddd";
-            announcementDiv.style.marginTop = "10px";
-            announcementDiv.style.borderRadius = "5px";
-            announcementDiv.innerHTML = `<strong>CCS Admin | ${dateString}</strong><p>${text}</p>`;
-
-            document.getElementById("announcementList").prepend(announcementDiv);
-            document.getElementById("announcementText").value = "";
-        }
-
-    </script>
-
-    <!-- ====== ionicons ======= -->
+				<div id="announcementDetailsModal" class="announcement-modal">
+					<div class="announcement-modal-content">
+						<span class="announcement-close" onclick="closeAnnouncementDetailsModal()">&times;</span>
+						<h3 class="announcement-header">📢 ANNOUNCEMENT DETAILS</h3>
+						<hr>
+						<div class="announcement-body">
+							<h2 class="announcement-title" id="announcementTitle"></h2>
+							<p id="announcementContent"></p>
+						</div>
+						<hr>
+						<p class="announcement-date"><strong>Posted On:</strong> <span id="announcementDate"></span></p>
+					</div>
+				</div>
+				
+				<form id="announcementForm" class="modal">
+					<div class="modal-content">
+						<h3>Edit Announcement</h3>
+				
+						<label for="announcementFormTitle">Announcement Title</label>
+						<input type="text" id="announcementFormTitle" name="title" placeholder="Announcement Title" required>
+				
+						<label for="emailSubject">Email Subject</label>
+						<input type="text" id="emailSubject" name="emailSubject" placeholder="Email Subject">
+				
+						<label for="announcementFormContent">Announcement Content</label>
+						<textarea id="announcementFormContent" name="content" placeholder="Click or Tap to enter something..." required></textarea>
+				
+						<div class="checkbox-container">
+							<input type="checkbox" id="emailAllUsers" name="emailUsers" value="true">
+							<label for="emailAllUsers">Email this announcement to all users</label>
+						</div>
+				
+						<button type="button" id="saveAnnouncement" class="btn-save">Save Announcement</button>
+						<a href="#" id="cancelAnnouncement" class="btn-cancel">Nevermind, Cancel</a>
+					</div>
+				</form>
+				
+				
+			</div>
+		</main>
+		<!-- MAIN -->
+	</section>
+	<!-- NAVBAR -->
+	 <!-- jQuery and DataTables JS -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<!-- <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script> -->
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+	<script src="../static/js/scripts.js"></script>
 </body>
-
 </html>

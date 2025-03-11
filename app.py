@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, flash, session, make_response, url_for, jsonify
 import dbhelper, os
-from dbhelper import get_student_by_username, update_student_profile, is_idno_exists, count_student_reservations
+from dbhelper import get_student_by_username, update_student_profile, is_idno_exists, count_student_reservations, get_all_student_emails, delete_announcement
 from werkzeug.utils import secure_filename
 from PIL import Image  
 
@@ -32,7 +32,6 @@ def disable_cache(response):
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
     return response
-
 
 # =============== STUDENT AREA ===================== STUDENT AREA ======================= STUDENT AREA ============= STUDENT AREA ===============
 
@@ -162,9 +161,105 @@ def student_register():
     return render_template("student_register.html")
 
 
+# ADD ANNOUNCEMENTS 
+@app.route("/add_announcement", methods=["POST"])
+def add_announcement():
+    if "user" not in session or not dbhelper.is_admin(session["user"]):
+        flash("Unauthorized access!", "danger")
+        return redirect("/login")
 
+    title = request.form.get("title")
+    content = request.form.get("content")
+    email_subject = request.form.get("emailSubject", title)  # Default subject = title
+    email_users_value = request.form.get("emailUsers") # Checkbox (Convert to Boolean)
+    email_users = email_users_value is not None
+
+    if not title or not content:
+        flash("Title and content are required!", "danger")
+        return redirect("/admin_dashboard")
+
+    print(f"Adding announcement: {title} - {content}")  # DEBUGGING
+    success = dbhelper.add_announcement(title, content)  # Save to database
+
+    if success:
+        print("Announcement saved successfully!")  # DEBUGGING
+        flash("Announcement added successfully!", "success")
+
+        # ✅ Send email if admin checked "Email this announcement to all students"
+        if email_users:
+            send_email(email_subject, content)
+
+    else:
+        print("Failed to save announcement!")  # DEBUGGING
+        flash("Failed to add announcement.", "danger")
+
+    return redirect("/admin_dashboard")
+
+# GET ANNOUNCEMENTS
+@app.route("/get_announcements", methods=["GET"])
+def get_announcements():
+    if "user" not in session:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    page = int(request.args.get("page", 1))  # Get page number (default: 1)
+    search_query = request.args.get("search", "").strip().lower()
+
+    # Set page size to 5
+    page_size = 5
+    offset = (page - 1) * page_size
+
+    # Fetch announcements from the database
+    try:
+        # Use SQL to filter and paginate announcements
+        sql = """
+            SELECT id, title, content, date_posted
+            FROM announcements
+            WHERE LOWER(title) LIKE ?
+            ORDER BY date_posted DESC
+            LIMIT ? OFFSET ?
+        """
+        search_pattern = f"%{search_query}%"  # SQL LIKE pattern
+        announcements = dbhelper.getprocess(sql, (search_pattern, page_size, offset))
+
+        # Get total number of matching announcements
+        count_sql = """
+            SELECT COUNT(*)
+            FROM announcements
+            WHERE LOWER(title) LIKE ?
+        """
+        total_entries = dbhelper.getprocess(count_sql, (search_pattern,))[0]["COUNT(*)"]
+
+        # Calculate total pages
+        total_pages = max(1, (total_entries + page_size - 1) // page_size)  # Ceiling division
+
+        # Return the response
+        return jsonify({
+            "current_page": page,
+            "total_pages": total_pages,
+            "total_entries": total_entries,
+            "data": announcements
+        })
+
+    except Exception as e:
+        # Handle database errors
+        return jsonify({"error": str(e)}), 500
 
 # STUDENT DASHBOARD
+# @app.route("/student_dashboard")
+# def student_dashboard():
+#     if "user" not in session:
+#         flash("Please log in first.", "warning")
+#         return redirect("/login")
+
+#     student_info = dbhelper.get_student_by_username(session["user"])
+
+#     if not student_info:
+#         flash("User not found!", "danger")
+#         return redirect("/login")
+
+#     session["student_info"] = student_info  
+#     return render_template("student_dashboard.html", student=student_info)
+
 @app.route("/student_dashboard")
 def student_dashboard():
     if "user" not in session:
@@ -172,13 +267,14 @@ def student_dashboard():
         return redirect("/login")
 
     student_info = dbhelper.get_student_by_username(session["user"])
-
     if not student_info:
         flash("User not found!", "danger")
         return redirect("/login")
 
-    session["student_info"] = student_info  
-    return render_template("student_dashboard.html", student=student_info)
+    announcements = dbhelper.get_announcements()  # Fetch announcements
+
+    return render_template("student_dashboard.html", student=student_info, announcements=announcements)
+
 
 # UPLOAD PROFILE PICTURE
 @app.route("/upload_profile_picture", methods=["POST"])
@@ -397,6 +493,31 @@ def logout():
 
 
 
+# FUNCTION TO SEND EMAIL TO ALL REGISTERED STUDENTS
+def send_email(subject, content):
+    recipients = get_all_student_emails()  # Fetch student emails from the database
+
+    if not recipients:  # If no students are registered, don't send email
+        print("❌ No registered student emails found.")
+        return
+
+    print(f"📧 Sending email to: {recipients}")  # Debugging - See recipient list
+
+    msg = MIMEText(content)
+    msg["Subject"] = subject
+    msg["From"] = EMAIL_ADDRESS
+    msg["To"] = ", ".join(recipients)  # Only for display, not for sending
+
+    try:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            # 🔹 `recipients` should be a list, not a string
+            server.sendmail(EMAIL_ADDRESS, recipients, msg.as_string())  
+        print("✅ Email sent successfully!")
+    except Exception as e:
+        print("⚠️ Error sending email:", e)
+
 
 # =============== ADMIN AREA ===================== ADMIN AREA ======================= ADMIN AREA ============= ADMIN AREA ===============
 
@@ -405,8 +526,51 @@ def logout():
 def admin_dashboard():
     if "user" not in session or not dbhelper.is_admin(session["user"]):
         return redirect("/login")
+    
+    announcements = dbhelper.get_announcements() 
+    return render_template("admin_dashboard.html", announcements=announcements)
+
+# ADMIN STUDENTS
+@app.route("/admin_students")
+def admin_students():
+    if "user" not in session or not dbhelper.is_admin(session["user"]):
+        return redirect("/login")
+    
     return render_template("admin_dashboard.html")
 
+# DELETE ANNOUNCEMENT
+@app.route('/delete-announcement/<int:announcement_id>', methods=['POST'])
+def delete_announcement(announcement_id):
+    try:
+        success = dbhelper.delete_announcement(announcement_id)
+        if success:
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to delete the announcement.'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
 
+# EDIT ANNOUNCEMENT 
+@app.route('/edit-announcement/<int:announcement_id>', methods=['POST'])
+def edit_announcement(announcement_id):
+    try:
+        data = request.get_json()  # Extract data from AJAX request
+        new_content = data.get('content')
+
+        if not new_content:
+            return jsonify({'success': False, 'message': 'Content cannot be empty.'})
+
+        success = dbhelper.update_announcement(announcement_id, new_content)
+
+        if success:
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to update the announcement.'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+    
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+
