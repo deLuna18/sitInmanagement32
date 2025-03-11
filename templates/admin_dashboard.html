@@ -27,7 +27,7 @@
                 </a>
 			</li>
 			<li>
-                <a href="#">
+                <a href="{{ url_for('admin_students') }}">
                     <span class="icon">
                         <ion-icon name="school-outline"></ion-icon>
                     </span>
@@ -100,11 +100,12 @@
 	<section id="content">
 		<!-- NAVBAR -->
 		<nav>
+			<!-- SEARCH BAR -->
 			<i class='bx bx-menu toggle-sidebar' ></i>
-			<form action="#">
+			<form id="searchForm">
 				<div class="form-group">
-					<input type="text" placeholder="Search...">
-					<i class='bx bx-search icon' ></i>
+					<input type="text" id="searchInput" placeholder="Search by ID or Last Name...">
+					<button type="button" id="searchBtn" class="search-btn">Search</button>
 				</div>
 			</form>
 			<a href="#" class="nav-link">
@@ -126,6 +127,90 @@
 			</div>
 		</nav>
 		<!-- NAVBAR -->
+
+		<!-- MODAL FOR STUDENT SIT-IN [CONNECTED TO SEARCH BAR] -->
+		<div id="sitInModal" 
+			style="
+				display: none;
+				position: fixed; 
+				top: 0; 
+				left: 0; 
+				width: 100%; 
+				height: 100%; 
+				background-color: rgba(0, 0, 0, 0.5); 
+				z-index: 9999; /* Highest priority */
+				justify-content: center; 
+				align-items: center;
+				
+				
+
+				">
+
+			<div class="modal-content" 
+				style="
+					
+					background-color: #fff; 
+					padding: 20px; 
+					border-radius: 10px; 
+					box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); 
+					width: 100%; 
+					max-width: 500px;
+					">
+					
+					
+				<h2>Sit In Form</h2>
+			
+				<label>ID Number:</label>
+				<input type="text" id="idNumber" readonly>
+
+				<label>Student Name:</label>
+				<input type="text" id="studentName" readonly>
+
+				<label>Purpose:</label>
+				<input type="text" id="purpose" readonly>
+
+				<label>Lab:</label>
+				<input type="text" id="lab" readonly>
+
+				<label>Remaining Sessions:</label>
+				<input type="text" id="remainingSessions" readonly>
+
+				<div style="display: flex; gap: 10px; margin-top: 10px;">
+					<button id="closeModal" style="
+						background-color: #d9534f; 
+						color: #fff; 
+						border: none; 
+						border-radius: 5px; 
+						padding: 8px 20px; 
+						cursor: pointer;
+						transition: background 0.3s ease;">
+						Close
+					</button>
+				
+					<button id="acceptBtn" style="
+						background-color: #5cb85c; 
+						color: #fff; 
+						border: none; 
+						border-radius: 5px; 
+						padding: 8px 20px; 
+						cursor: pointer;
+						transition: background 0.3s ease;">
+						Accept
+					</button>
+				
+					<button id="rejectBtn" style="
+						background-color: #f0ad4e; 
+						color: #fff; 
+						border: none; 
+						border-radius: 5px; 
+						padding: 8px 20px; 
+						cursor: pointer;
+						transition: background 0.3s ease;">
+						Reject
+					</button>
+				</div>
+			</div>
+		</div>
 
 		<!-- MAIN -->
 		<main>

@@ -104,14 +104,12 @@ def create_reservation(idno: int, student_name: str, course: str, year_level: st
     return postprocess(sql, (idno, student_name, course, year_level, purpose, lab, time_in, date))
 
 
-# GET STUDENT HISTORY RESERVATION
-def get_student_reservations_paginated(idno: int, per_page: int, offset: int) -> list:
-    sql = """SELECT idno, student_name, course, year_level, purpose, lab, time_in, date 
-             FROM reservations 
-             WHERE idno = ? 
-             ORDER BY date DESC 
-             LIMIT ? OFFSET ?"""
-    return getprocess(sql, (idno, per_page, offset))
+
+
+
+
+
+
 
 # COUNT FOR PAGINATION
 def count_student_reservations(idno: int) -> int:
@@ -158,3 +156,41 @@ def delete_announcement(announcement_id: int) -> bool:
 def update_announcement(announcement_id: int, new_content: str) -> bool:
     sql = "UPDATE announcements SET content = ? WHERE id = ?"
     return postprocess(sql, (new_content, announcement_id))
+
+def get_reservation_by_id_or_student(search_value):
+    query = """
+    SELECT idno, student_name, purpose, lab, remaining_sessions
+    FROM reservations
+    WHERE idno = ? OR student_name LIKE ?
+    """
+    result = getprocess(query, (search_value, f"%{search_value}%"))
+    print("Database Result:", result)
+    return result if result else []
+
+
+
+
+# GET RESERVATION BY ID
+def get_reservation_by_id(id_number: str) -> dict:
+    sql = "SELECT * FROM reservations WHERE idno = ?"
+    result = getprocess(sql, (id_number,))
+    return result[0] if result else {}
+
+# UPDATE RESERVATION STATUS
+def update_reservation_status(id_number: str, status: str) -> None:
+    remaining_sessions = 30 if status == "Accepted" else 0
+    sql = "UPDATE reservations SET status = ?, remaining_sessions = ? WHERE idno = ?"
+    rows_affected = postprocess(sql, (status, remaining_sessions, id_number))
+    if rows_affected == 0:
+        print(f"No reservation updated for ID {id_number}.")
+
+# GET STUDENT HISTORY RESERVATION
+def get_student_reservations_paginated(idno: int, per_page: int, offset: int):
+    sql = """SELECT idno, student_name, course, year_level, purpose, lab, time_in, date, status
+             FROM reservations 
+             WHERE idno = ? AND status = 'Accepted'
+             ORDER BY date DESC 
+             LIMIT ? OFFSET ?"""
+    print("Executing query:", sql)
+    print("Parameters:", (idno, per_page, offset))
+    return getprocess(sql, (idno, per_page, offset))

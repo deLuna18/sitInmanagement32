@@ -352,5 +352,71 @@ document.addEventListener("DOMContentLoaded", function () {
 	});
 
 
+	// SEARCH BARRRR
+	// SEARCH BARRRR
+	$(document).ready(function() {
+		$('#searchBtn').on('click', function() {
+			var searchValue = $('#searchInput').val().trim();
+	
+			if (searchValue) {
+				$.ajax({
+					url: "/search_reservation",
+					method: "POST",
+					data: { searchValue: searchValue },
+					success: function(response) {
+						if (response.error) {
+							alert(response.error); // Kung walay nakuha nga data
+						} else {
+							$('#idNumber').val(response[0].idNumber);
+							$('#studentName').val(response[0].studentName);
+							$('#purpose').val(response[0].purpose);
+							$('#lab').val(response[0].lab);
+							$('#remainingSessions').val(response[0].remainingSessions);
+	
+							$('#sitInModal').css("display", "flex"); // Show modal
+						}
+					},
+					error: function() {
+						alert("Error fetching reservation data.");
+					}
+				});
+			} else {
+				alert("Please enter a search value.");
+			}
+		});
+	
+		$('#closeModal').on('click', function() {
+			$('#sitInModal').hide(); // Isira ang modal
+		});
+	});
+
+
+	// ACCEPT BUTTON
+
+	$(document).ready(function () {
+		$("#acceptBtn").click(function () {
+			const idNumber = $("#idNumber").val();
+	
+			$.ajax({
+				url: "/accept_reservation",
+				method: "POST",
+				data: { 
+					idNumber: idNumber,
+					status: "Accepted"  // Add this to ensure correct status
+				},
+				success: function (response) {
+					alert(response.message);
+					location.reload();  // Refresh the page to reflect changes
+				},
+				error: function (xhr) {
+					alert(xhr.responseJSON.error);
+				}
+			});
+		});
+	});
+	
+
+	
+	
 });
 

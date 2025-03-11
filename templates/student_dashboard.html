@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
@@ -203,13 +203,13 @@
     /* ANNOUNCEMENT CARD */
     .announcements {
         flex: 1 1 auto; 
-        max-width: 50%; 
+        max-width: 35%; 
     }
 
     /* RULES AND REGULATION CARD */
     .rules-card {
         flex: 1 1 20%; 
-        max-width: 20%; 
+        max-width: 35%; 
         height: 70vh;
         overflow-y: auto;
     }
@@ -427,7 +427,8 @@
             <div class="card-body">
                 {% if announcements %}
                     {% for ann in announcements %}
-                        <h5>CCS Admin | {{ ann.date_posted[:10] }}</h5>
+                        <h5 style="color: gray;">CCS Admin | {{ ann.date_posted[:10] }}</h5>
+                        <h4><i class="ri-megaphone-line" style="font-size: 16px;"> </i>{{ ann.title }}</h4>
                         <p>{{ ann.content }}</p>
                         <hr>
                     {% endfor %}

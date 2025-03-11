@@ -1,5 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap'); */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Poppins:wght@100;200;300;400&display=swap');
 
 * {
 	font-family: 'Poppins', sans-serif;
@@ -10,6 +11,7 @@
 
 :root {
 	--grey: #F1F0F6;
+	/* --grey: #D7B033; */
 	--dark-grey: #8D8D8D;
 	--light: #fff;
 	--dark: #000;
@@ -17,6 +19,7 @@
 	--light-green: #E3FFCB;
 	/* --blue: #1775F1; */
   --blue: #603A7E;
+	/* --light-blue: #D0E4FF; */
 	--light-blue: #D0E4FF;
 	--dark-blue: #0C5FCD;
 	--red: #FC3B56;
@@ -227,7 +230,25 @@ nav form {
 }
 nav .form-group {
 	position: relative;
+	display: flex;
+    align-items: center; /* Align items vertically */
+    gap: 5px;
 }
+
+nav .form-group .search-btn {
+    background: var(--blue); 
+    color: #fff; 
+    border: none;
+    border-radius: 5px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background .3s ease;
+}
+
+nav .form-group .search-btn:hover {
+    background: #603a7ede; 
+}
+
 nav .form-group input {
 	width: 100%;
 	background: var(--grey);
@@ -925,4 +946,16 @@ hr {
 textarea#announ_cusContent {
     padding: 10px; /* Existing padding */
     text-align: left; /* Ensure text starts from the left */
+}
+
+#closeModal:hover {
+    background-color: #c9302c;
+}
+
+#acceptBtn:hover {
+    background-color: #4cae4c;
+}
+
+#rejectBtn:hover {
+    background-color: #ec971f;
 }

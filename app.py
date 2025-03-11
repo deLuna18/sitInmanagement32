@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, flash, session, make_response, url_for, jsonify
 import dbhelper, os
-from dbhelper import get_student_by_username, update_student_profile, is_idno_exists, count_student_reservations, get_all_student_emails, delete_announcement
+from dbhelper import get_student_by_username, update_student_profile, is_idno_exists, get_reservation_by_id_or_student, get_all_student_emails, delete_announcement
 from werkzeug.utils import secure_filename
 from PIL import Image  
 
@@ -420,7 +420,7 @@ def student_reservation():
         return redirect("/student_dashboard")
 
     idno = student.get("idno")  
-    student_name = f"{student.get('firstname')} {student.get('lastname')}"  # Full name
+    student_name = f"{student.get('firstname')} {student.get('lastname')}"  
     course = student.get("course")
     year_level = student.get("year_level")
 
@@ -430,7 +430,7 @@ def student_reservation():
         time_in = request.form.get("time_in")
         date = request.form.get("date")
 
-        if not all([purpose, lab, time_in, date]):  # Ensure all fields are filled
+        if not all([purpose, lab, time_in, date]): 
             flash("Please fill out all fields.", "warning")
             return redirect("/student_reservation")
 
@@ -445,36 +445,7 @@ def student_reservation():
     return render_template("student_reservation.html", student=student)
 
 
-# HISTORY FOR STUDENT RESERVATION
-@app.route("/student_history")
-def student_history():
-    if "user" not in session:
-        flash("Please log in first.", "warning")
-        return redirect("/login")
 
-    student = dbhelper.get_student_by_username(session["user"])
-    if not student:
-        flash("User not found!", "danger")
-        return redirect("/student_dashboard")
-
-    idno = student.get("idno")
-
-    # Get page number from request, default to 1
-    page = request.args.get("page", 1, type=int)
-    per_page = 10  # Set items per page
-    offset = (page - 1) * per_page
-
-    reservations = dbhelper.get_student_reservations_paginated(idno, per_page, offset)
-    total_reservations = dbhelper.count_student_reservations(idno)
-
-    total_pages = (total_reservations + per_page - 1) // per_page  # Calculate total pages
-
-    return render_template(
-        "student_history_reservation.html",
-        reservations=reservations,
-        page=page,
-        total_pages=total_pages
-    )
 
 
 # LOGOUT FOR STUDENTS AND ADMIN
@@ -536,7 +507,7 @@ def admin_students():
     if "user" not in session or not dbhelper.is_admin(session["user"]):
         return redirect("/login")
     
-    return render_template("admin_dashboard.html")
+    return render_template("admin_students.html")
 
 # DELETE ANNOUNCEMENT
 @app.route('/delete-announcement/<int:announcement_id>', methods=['POST'])
@@ -568,6 +539,100 @@ def edit_announcement(announcement_id):
             return jsonify({'success': False, 'message': 'Failed to update the announcement.'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
+
+# SEARCH RESERVATION
+@app.route("/search_reservation", methods=["POST"])
+def search_reservation():
+    try:
+        search_value = request.form.get("searchValue")
+
+        reservation = get_reservation_by_id_or_student(search_value)
+
+        if reservation:
+            # Map database fields to JSON format for multiple records
+            result = [
+                {
+                    "idNumber": res["idno"],
+                    "studentName": res["student_name"],
+                    "purpose": res["purpose"],
+                    "lab": res["lab"],
+                    "remainingSessions": res["remaining_sessions"]
+                }
+                for res in reservation
+            ]
+            return jsonify(result)
+        else:
+            return jsonify({"error": "Reservation not found"}), 404
+
+    except Exception as e:
+        print("Server Error:", str(e))  # Detailed error for debugging
+        return jsonify({"error": "Internal server error"}), 500
+
+
+# ACCEPT RESERVATION
+@app.route("/accept_reservation", methods=["POST"])
+def accept_reservation():
+    try:
+        id_number = request.form.get("idNumber")
+
+        reservation = dbhelper.get_reservation_by_id(id_number)
+        if not reservation:
+            return jsonify({"error": "Reservation not found"}), 404
+
+        # Check if the reservation is already accepted
+        if reservation['status'] == "Accepted":
+            return jsonify({"message": "Reservation already accepted."}), 400
+        
+        dbhelper.update_reservation_status(id_number, "Accepted")
+        
+        # Log success (optional)
+        print(f"Reservation {id_number} accepted successfully.")
+
+        return jsonify({"message": "Reservation accepted successfully!"})
+
+    except Exception as e:
+        print("Error accepting reservation:", str(e))
+        return jsonify({"error": "Failed to accept reservation"}), 500
+
+
+# HISTORY FOR STUDENT RESERVATION
+@app.route("/student_history")
+def student_history():
+    if "user" not in session:
+        flash("Please log in first.", "warning")
+        return redirect("/login")
+
+    student = dbhelper.get_student_by_username(session["user"])
+    if not student:
+        flash("User not found!", "danger")
+        return redirect("/student_dashboard")
+
+    idno = student.get("idno")
+
+    # Get page number from request, default to 1
+    page = request.args.get("page", 1, type=int)
+    per_page = 10  # Set items per page
+    offset = (page - 1) * per_page
+
+    reservations = dbhelper.get_student_reservations_paginated(idno, per_page, offset)
+    total_reservations = dbhelper.count_student_reservations(idno)
+
+    if not reservations:
+        flash("No reservations found.", "info")
+
+    total_pages = (total_reservations + per_page - 1) // per_page  # Calculate total pages
+
+    print("Reservations:", reservations)
+    print("Page:", page)
+    print("Total Pages:", total_pages)
+    print("Fetching reservations for student ID:", idno)
+    reservations = dbhelper.get_student_reservations_paginated(idno, per_page, offset)
+    print("Reservations:", reservations)
+
+
+    return render_template("student_history_reservation.html",reservations=reservations,page=page,total_pages=total_pages)
+
+
     
 if __name__ == "__main__":
     app.run(debug=True)

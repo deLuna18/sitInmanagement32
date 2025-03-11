@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>History Information</title>
-    <link rel="stylesheet" href="styles.css">
+    <!-- <link rel="stylesheet" href="styles.css"> -->
     <link rel="icon" type="image/x-icon" href="../static/images/ux.png">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #F8F5FA; /* Updated background color */
-            color: #2E1F33; /* Updated text color */
+            background-color: #F8F5FA; 
+            color: #2E1F33; 
         }
         .navbar {
-            background-color: #603A7E; /* Updated primary color */
+            background-color: #603A7E; 
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
@@ -44,7 +44,7 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
         }
         h2 {
-            color: #603A7E; /* Updated heading color */
+            color: #603A7E; 
             text-align: center;
             font-size: 1.8rem;
             margin-bottom: 20px;
@@ -57,7 +57,7 @@
         }
         .search-bar {
             padding: 8px;
-            border: 1px solid #D6C9E1; /* Updated border color */
+            border: 1px solid #D6C9E1; 
             border-radius: 5px;
             width: 250px;
         }
@@ -71,10 +71,10 @@
         th, td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #D6C9E1; /* Updated border color */
+            border-bottom: 1px solid #D6C9E1; 
         }
         th {
-            background-color: #603A7E; /* Updated primary color */
+            background-color: #603A7E; 
             color: white;
             font-weight: bold;
         }
@@ -87,7 +87,7 @@
             margin-top: 20px;
         }
         .pagination button {
-            background-color: #603A7E; /* Updated primary color */
+            background-color: #603A7E; 
             color: white;
             border: none;
             padding: 8px 12px;
@@ -97,36 +97,36 @@
             transition: 0.3s;
         }
         .pagination button:hover {
-            background-color: #4B2D5E; /* Updated hover color */
+            background-color: #4B2D5E; 
         }
 
         /* ACCENT COLOR (#FFAF10) USAGE */
         .accent-text {
-            color: #FFAF10; /* Accent color for text */
+            color: #FFAF10; 
         }
         .accent-border {
-            border-color: #FFAF10; /* Accent color for borders */
+            border-color: #FFAF10; 
         }
         .accent-bg {
-            background-color: #FFAF10; /* Accent color for backgrounds */
+            background-color: #FFAF10; 
         }
         .accent-btn {
-            background-color: #FFAF10; /* Accent color for buttons */
+            background-color: #FFAF10; 
             color: white;
         }
         .accent-btn:hover {
-            background-color: #e09b0d; /* Darker shade for hover */
+            background-color: #e09b0d; 
         }
         .pagination {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px; /* Space between elements */
+    gap: 10px;
     margin-top: 20px;
 }
 
 .pagination-btn {
-    background-color: #603A7E; /* Your primary color */
+    background-color: #603A7E;
     color: white;
     text-decoration: none;
     padding: 8px 12px;
@@ -136,7 +136,37 @@
 }
 
 .pagination-btn:hover {
-    background-color: #4B2D5E; /* Darker shade on hover */
+    background-color: #4B2D5E; 
+}
+
+.accepted { color: #5cb85c; }   /* Green */
+    .rejected { color: #d9534f; }   /* Red */
+    .pending { color: gray; }       /* Gray */
+
+    /* Ensure the table and text color is visible */
+table, th, td {
+    border: 1px solid #D6C9E1; /* Ensure the table border is visible */
+    padding: 12px;
+    text-align: left;
+}
+
+/* Styling for the "No data available" message */
+td[colspan="9"] {
+    text-align: center;
+    color: gray;
+    font-weight: bold;
+}
+
+/* For pagination */
+.pagination-btn {
+    background-color: #603A7E;
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background 0.3s;
+    display: inline-block; /* Ensure buttons are shown inline */
 }
     </style>
 </head>
@@ -170,10 +200,11 @@
                 <tr>
                     <th style="text-align: center;">ID Number</th>
                     <th style="text-align: center;">Name</th>
-                    <th style="text-align: center;">Sit Purpose</th>
-                    <th style="text-align: center;">Laboratory</th>
-                    <th style="text-align: center;">Login</th>
-                    <th style="text-align: center;">Logout</th>
+                    <th style="text-align: center;">Course</th>
+                    <th style="text-align: center;">Year_level </th>
+                    <th style="text-align: center;">Purpose </th>
+                    <th style="text-align: center;">Lab</th>
+                    <th style="text-align: center;">Time-In</th>
                     <th style="text-align: center;">Date</th>
                     <th style="text-align: center;">Action</th>
                 </tr>
@@ -182,19 +213,26 @@
                 {% if reservations %}
                     {% for res in reservations %}
                     <tr>
-                        <td colspan="1" style="text-align: center; color: gray;" >{{ res.idno }}</td>
-                        <td colspan="1" style="text-align: center; color: gray;">{{ res.res_name }}</td>
-                        <td colspan="1" style="text-align: center; color: gray;">{{ res.course }}</td>
-                        <td colspan="1" style="text-align: center; color: gray;">{{ res.year_level }}</td>
-                        <td colspan="1" style="text-align: center; color: gray;">{{ res.purpose }}</td>
-                        <td colspan="1" style="text-align: center; color: gray;">{{ res.lab }}</td>
-                        <td colspan="1" style="text-align: center; color: gray;">{{ res.time_in }}</td>
-                        <td colspan="1" style="text-align: center; color: gray;">{{ res.date }}</td>
+                        <td style="text-align: center; color: gray;">{{ res.idno }}</td>
+                        <td style="text-align: center; color: gray;">{{ res.student_name }}</td>
+                        <td style="text-align: center; color: gray;">{{ res.course }}</td>
+                        <td style="text-align: center; color: gray;">{{ res.year_level }}</td>
+                        <td style="text-align: center; color: gray;">{{ res.purpose }}</td>
+                        <td style="text-align: center; color: gray;">{{ res.lab }}</td>
+                        <td style="text-align: center; color: gray;">{{ res.time_in }}</td>
+                        <td style="text-align: center; color: gray;">{{ res.date }}</td>
+                        <td style="text-align: center; color: gray;">{{ res.remaining_sessions }}</td>
+                        <td style="text-align: center;" class="
+                            {{ 'accepted' if res.status == 'Accepted' else 
+                            'rejected' if res.status == 'Rejected' else 
+                            'pending' }}">
+                            {{ res.status }}
+                        </td>
                     </tr>
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="8" style="text-align: center; color: gray;">No data available</td>
+                        <td colspan="9" style="text-align: center; color: gray;">No data available</td>
                     </tr>
                 {% endif %}
             </tbody>
