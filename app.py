@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, flash, session, make_response, url_for, jsonify
 import dbhelper, os
-from dbhelper import get_student_by_username, update_student_profile, is_idno_exists, get_reservation_by_id_or_student, get_all_student_emails, delete_announcement
+
+from dbhelper import get_student_by_username, update_student_profile, is_idno_exists, get_reservation_by_id_or_student, get_all_student_emails, delete_announcement, getprocess, get_all_registered_students, count_all_registered_students, get_admin_student_reservations,get_weekly_enrollment, get_monthly_enrollment, get_yearly_enrollment, count_all_reservations,search_student,get_reserved_students, get_enrolled_students
+
 from werkzeug.utils import secure_filename
 from PIL import Image  
 
@@ -13,19 +15,24 @@ from email.mime.multipart import MIMEMultipart
 app = Flask(__name__)
 app.secret_key = "deluna"
 
+
+# SMTP CONFIGURATION
 SMTP_SERVER = "smtp.gmail.com" 
 SMTP_PORT = 587
 EMAIL_ADDRESS = "deluna.alexa494@gmail.com"  
 EMAIL_PASSWORD = "xofo wvge gyaj imou" 
 
+# PATH FOR UPLOADING PROFILE PICTURE
 UPLOAD_FOLDER = "static/uploads"
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
+# ALLOWED FILE EXTENSIONS
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# DISABLE CACHE
 @app.after_request
 def disable_cache(response):
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0'
@@ -45,22 +52,12 @@ def home():
     return redirect("/login")
 
 
-# LOGIN FOR STUDENT AND ADMIN
+# LOGIN ROUTE - TO CHECK IF THE USER IS AN ADMIN OR A STUDENT
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    username_cookie = request.cookies.get("username")
-    if username_cookie:
-        session["user"] = username_cookie
-        session["role"] = "admin" if dbhelper.is_admin(username_cookie) else "student"  # Store role
-
-        if session["role"] == "admin":
-            return redirect("/admin_dashboard")
-        return redirect("/student_dashboard")
-
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-        remember_me = request.form.get("remember_me")
 
         user = dbhelper.get_username(username)
 
@@ -68,7 +65,7 @@ def login():
             session["user"] = username
             session["idno"] = user[0]["idno"]
             session["logged_in"] = True
-            session["role"] = "admin" if dbhelper.is_admin(username) else "student"  # Store role
+            session["role"] = "admin" if dbhelper.is_admin(username) else "student"
 
             # REDIRECT ADMIN TO ADMIN DASHBOARD 
             if session["role"] == "admin":
@@ -77,18 +74,13 @@ def login():
 
             # REDIRECT STUDENTS TO STUDENTS DASHBOARD 
             flash("Login successful!", "success")
-            if remember_me:
-                resp = make_response(redirect("/student_dashboard"))
-                resp.set_cookie("username", username, max_age=30*24*60*60, path='/')  # 30 days
-                return resp
-
             return redirect("/student_dashboard")
 
         flash("Invalid username or password.", "danger")
 
     return render_template("login.html")
 
-# FORGOT PASSWORD
+# FORGOT PASSWORD - SEND EMAIL TO RESET PASSWORD
 @app.route('/forgot-password', methods=['POST'])
 def forgot_password():
     email = request.form.get('email')
@@ -130,7 +122,7 @@ def forgot_password():
     return redirect(url_for('login', forgot_password=True))
 
 
-# REGISTRATION
+# REGISTRATION ROUTE - REGISTRATION FOR A NEW STUDENT
 @app.route("/student_register", methods=["GET", "POST"])
 def student_register():
     if request.method == "POST":
@@ -144,7 +136,7 @@ def student_register():
         username = request.form["username"]
         password = request.form["password"]  
 
-        # Validate if idno already exists
+        # VALIDATE IF ID NUMBER ALREADY EXISTS
         if is_idno_exists(idno):
             flash("ID Number already exists. Please use a different ID number.", "danger")
             return redirect("/student_register")
@@ -160,7 +152,6 @@ def student_register():
 
     return render_template("student_register.html")
 
-
 # ADD ANNOUNCEMENTS 
 @app.route("/add_announcement", methods=["POST"])
 def add_announcement():
@@ -168,32 +159,33 @@ def add_announcement():
         flash("Unauthorized access!", "danger")
         return redirect("/login")
 
-    title = request.form.get("title")
-    content = request.form.get("content")
-    email_subject = request.form.get("emailSubject", title)  # Default subject = title
-    email_users_value = request.form.get("emailUsers") # Checkbox (Convert to Boolean)
+    data = request.get_json() 
+    title = data.get("title")
+    content = data.get("content")
+    email_subject = data.get("emailSubject", title)  
+    email_users_value = data.get("emailUsers") 
     email_users = email_users_value is not None
 
     if not title or not content:
         flash("Title and content are required!", "danger")
-        return redirect("/admin_dashboard")
+        return jsonify({"success": False})
 
-    print(f"Adding announcement: {title} - {content}")  # DEBUGGING
-    success = dbhelper.add_announcement(title, content)  # Save to database
+    print(f"Adding announcement: {title} - {content}")  
+    success = dbhelper.add_announcement(title, content) 
 
     if success:
-        print("Announcement saved successfully!")  # DEBUGGING
+        print("Announcement saved successfully!")  
         flash("Announcement added successfully!", "success")
 
-        # ✅ Send email if admin checked "Email this announcement to all students"
         if email_users:
             send_email(email_subject, content)
 
+        return jsonify({"success": True})
     else:
-        print("Failed to save announcement!")  # DEBUGGING
+        print("Failed to save announcement!")  
         flash("Failed to add announcement.", "danger")
+        return jsonify({"success": False})
 
-    return redirect("/admin_dashboard")
 
 # GET ANNOUNCEMENTS
 @app.route("/get_announcements", methods=["GET"])
@@ -201,16 +193,13 @@ def get_announcements():
     if "user" not in session:
         return jsonify({"error": "Unauthorized"}), 403
 
-    page = int(request.args.get("page", 1))  # Get page number (default: 1)
+    page = int(request.args.get("page", 1)) 
     search_query = request.args.get("search", "").strip().lower()
 
-    # Set page size to 5
     page_size = 5
     offset = (page - 1) * page_size
 
-    # Fetch announcements from the database
     try:
-        # Use SQL to filter and paginate announcements
         sql = """
             SELECT id, title, content, date_posted
             FROM announcements
@@ -218,10 +207,9 @@ def get_announcements():
             ORDER BY date_posted DESC
             LIMIT ? OFFSET ?
         """
-        search_pattern = f"%{search_query}%"  # SQL LIKE pattern
+        search_pattern = f"%{search_query}%"  
         announcements = dbhelper.getprocess(sql, (search_pattern, page_size, offset))
 
-        # Get total number of matching announcements
         count_sql = """
             SELECT COUNT(*)
             FROM announcements
@@ -229,10 +217,8 @@ def get_announcements():
         """
         total_entries = dbhelper.getprocess(count_sql, (search_pattern,))[0]["COUNT(*)"]
 
-        # Calculate total pages
-        total_pages = max(1, (total_entries + page_size - 1) // page_size)  # Ceiling division
+        total_pages = max(1, (total_entries + page_size - 1) // page_size)  
 
-        # Return the response
         return jsonify({
             "current_page": page,
             "total_pages": total_pages,
@@ -241,25 +227,10 @@ def get_announcements():
         })
 
     except Exception as e:
-        # Handle database errors
         return jsonify({"error": str(e)}), 500
 
+
 # STUDENT DASHBOARD
-# @app.route("/student_dashboard")
-# def student_dashboard():
-#     if "user" not in session:
-#         flash("Please log in first.", "warning")
-#         return redirect("/login")
-
-#     student_info = dbhelper.get_student_by_username(session["user"])
-
-#     if not student_info:
-#         flash("User not found!", "danger")
-#         return redirect("/login")
-
-#     session["student_info"] = student_info  
-#     return render_template("student_dashboard.html", student=student_info)
-
 @app.route("/student_dashboard")
 def student_dashboard():
     if "user" not in session:
@@ -271,7 +242,7 @@ def student_dashboard():
         flash("User not found!", "danger")
         return redirect("/login")
 
-    announcements = dbhelper.get_announcements()  # Fetch announcements
+    announcements = dbhelper.get_announcements()  
 
     return render_template("student_dashboard.html", student=student_info, announcements=announcements)
 
@@ -411,7 +382,7 @@ def save_profile():
 def student_reservation():
     if "user" not in session:
         flash("Please log in first.", "warning")
-        return redirect("/login")
+        return redirect("/student_login")
 
     student = dbhelper.get_student_by_username(session["user"])
 
@@ -420,7 +391,7 @@ def student_reservation():
         return redirect("/student_dashboard")
 
     idno = student.get("idno")  
-    student_name = f"{student.get('firstname')} {student.get('lastname')}"  
+    student_name = f"{student.get('firstname')} {student.get('lastname')}"  # Full name
     course = student.get("course")
     year_level = student.get("year_level")
 
@@ -430,7 +401,7 @@ def student_reservation():
         time_in = request.form.get("time_in")
         date = request.form.get("date")
 
-        if not all([purpose, lab, time_in, date]): 
+        if not all([purpose, lab, time_in, date]):  
             flash("Please fill out all fields.", "warning")
             return redirect("/student_reservation")
 
@@ -444,8 +415,36 @@ def student_reservation():
 
     return render_template("student_reservation.html", student=student)
 
+# HISTORY FOR STUDENT RESERVATION
+@app.route("/student_history")
+def student_history():
+    if "user" not in session:
+        flash("Please log in first.", "warning")
+        return redirect("/student_login")
 
+    student = dbhelper.get_student_by_username(session["user"])
+    if not student:
+        flash("User not found!", "danger")
+        return redirect("/student_dashboard")
 
+    idno = student.get("idno")
+
+    # Get page number from request, default to 1
+    page = request.args.get("page", 1, type=int)
+    per_page = 10  # Set items per page
+    offset = (page - 1) * per_page
+
+    reservations = dbhelper.get_student_reservations_paginated(idno, per_page, offset)
+    total_reservations = dbhelper.count_student_reservations(idno)
+
+    total_pages = (total_reservations + per_page - 1) // per_page  
+
+    return render_template(
+        "student_history_reservation.html",
+        reservations=reservations,
+        page=page,
+        total_pages=total_pages
+    )
 
 
 # LOGOUT FOR STUDENTS AND ADMIN
@@ -469,7 +468,7 @@ def send_email(subject, content):
     recipients = get_all_student_emails()  # Fetch student emails from the database
 
     if not recipients:  # If no students are registered, don't send email
-        print("❌ No registered student emails found.")
+        print("No registered student emails found.")
         return
 
     print(f"📧 Sending email to: {recipients}")  # Debugging - See recipient list
@@ -507,7 +506,48 @@ def admin_students():
     if "user" not in session or not dbhelper.is_admin(session["user"]):
         return redirect("/login")
     
-    return render_template("admin_students.html")
+    page = request.args.get('page', 1, type=int)  # Default to page 1 if not specified
+    per_page = 10
+    search_query = request.args.get('search', '', type=str)  # Default search query is empty
+
+    # If there's no search query, return all students
+    if not search_query:
+        students = dbhelper.get_enrolled_students(page, per_page)
+    else:
+        # If there is a search query, apply it
+        students = dbhelper.get_enrolled_students(page, per_page, search_query)
+
+    # Filter out admin user
+    def filter_admin(users):
+        return [user for user in users if str(user['idno']) != '428237351']  # Filter out admin
+
+    students = filter_admin(students)
+
+    # Count the total number of students after excluding admin
+    total_students = dbhelper.count_all_registered_students()
+
+    # Calculate total pages for pagination
+    total_pages = (total_students + per_page - 1) // per_page
+
+    # Calculate the start and end range for the current page
+    start = (page - 1) * per_page + 1
+    end = min(page * per_page, total_students)
+
+    return render_template("admin_students.html", 
+                           students=students, 
+                           total_students=total_students, 
+                           page=page, 
+                           per_page=per_page, 
+                           total_pages=total_pages,
+                           start=start, 
+                           end=end,
+                           search_query=search_query)
+
+
+
+
+
+
 
 # DELETE ANNOUNCEMENT
 @app.route('/delete-announcement/<int:announcement_id>', methods=['POST'])
@@ -525,7 +565,7 @@ def delete_announcement(announcement_id):
 @app.route('/edit-announcement/<int:announcement_id>', methods=['POST'])
 def edit_announcement(announcement_id):
     try:
-        data = request.get_json()  # Extract data from AJAX request
+        data = request.get_json()  
         new_content = data.get('content')
 
         if not new_content:
@@ -540,100 +580,130 @@ def edit_announcement(announcement_id):
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
 
-# SEARCH RESERVATION
-@app.route("/search_reservation", methods=["POST"])
-def search_reservation():
-    try:
-        search_value = request.form.get("searchValue")
+@app.route("/search_reserved_students", methods=["GET"])
+def search_reserved_students():
+    query = request.args.get('query', '').strip().lower()
 
-        reservation = get_reservation_by_id_or_student(search_value)
+    if not query:  
+        return jsonify({"students": []})
 
-        if reservation:
-            # Map database fields to JSON format for multiple records
-            result = [
-                {
-                    "idNumber": res["idno"],
-                    "studentName": res["student_name"],
-                    "purpose": res["purpose"],
-                    "lab": res["lab"],
-                    "remainingSessions": res["remaining_sessions"]
-                }
-                for res in reservation
-            ]
-            return jsonify(result)
-        else:
-            return jsonify({"error": "Reservation not found"}), 404
+    
+    students = dbhelper.get_reserved_students(query)
 
-    except Exception as e:
-        print("Server Error:", str(e))  # Detailed error for debugging
-        return jsonify({"error": "Internal server error"}), 500
+    if not students: 
+        return jsonify({"students": []})
+
+    return jsonify({"students": students})  
 
 
 # ACCEPT RESERVATION
 @app.route("/accept_reservation", methods=["POST"])
 def accept_reservation():
-    try:
-        id_number = request.form.get("idNumber")
+    id_number = request.form.get("idNumber")
+    reservation = dbhelper.get_reservation_by_id(id_number)
+    if not reservation:
+        return jsonify({"error": "Reservation not found"}), 404
 
-        reservation = dbhelper.get_reservation_by_id(id_number)
-        if not reservation:
-            return jsonify({"error": "Reservation not found"}), 404
+    if reservation['status'] == "Accepted":
+        return jsonify({"message": "Reservation already accepted."}), 400
+    
+    dbhelper.update_reservation_status(id_number, "Accepted")
+    return jsonify({"message": "Reservation accepted successfully!"})
 
-        # Check if the reservation is already accepted
-        if reservation['status'] == "Accepted":
-            return jsonify({"message": "Reservation already accepted."}), 400
-        
-        dbhelper.update_reservation_status(id_number, "Accepted")
-        
-        # Log success (optional)
-        print(f"Reservation {id_number} accepted successfully.")
+# REJECT RESERVATION
+@app.route("/reject_reservation", methods=["POST"])
+def reject_reservation():
+    id_number = request.form.get("idNumber")
+    reservation = dbhelper.get_reservation_by_id(id_number)
+    if not reservation:
+        return jsonify({"error": "Reservation not found"}), 404
 
-        return jsonify({"message": "Reservation accepted successfully!"})
+    if reservation['status'] == "Rejected":
+        return jsonify({"message": "Reservation already rejected."}), 400
+    
+    dbhelper.update_reservation_status(id_number, "Rejected")
+    return jsonify({"message": "Reservation rejected successfully!"})
 
-    except Exception as e:
-        print("Error accepting reservation:", str(e))
-        return jsonify({"error": "Failed to accept reservation"}), 500
 
 
-# HISTORY FOR STUDENT RESERVATION
-@app.route("/student_history")
-def student_history():
-    if "user" not in session:
-        flash("Please log in first.", "warning")
+# ADMIN SIT-IN PAGE
+@app.route("/admin_sit_in")
+def admin_sit_in():
+    if "user" not in session or not dbhelper.is_admin(session["user"]):
+        flash("Please log in as an admin.", "warning")
         return redirect("/login")
 
-    student = dbhelper.get_student_by_username(session["user"])
-    if not student:
-        flash("User not found!", "danger")
-        return redirect("/student_dashboard")
-
-    idno = student.get("idno")
-
-    # Get page number from request, default to 1
     page = request.args.get("page", 1, type=int)
-    per_page = 10  # Set items per page
+    per_page = 10
     offset = (page - 1) * per_page
 
-    reservations = dbhelper.get_student_reservations_paginated(idno, per_page, offset)
-    total_reservations = dbhelper.count_student_reservations(idno)
+    reservations = dbhelper.get_all_reservations_paginated(per_page, offset)
+    total_reservations = dbhelper.count_all_reservations()
 
-    if not reservations:
-        flash("No reservations found.", "info")
+    total_pages = (total_reservations + per_page - 1) // per_page  
 
-    total_pages = (total_reservations + per_page - 1) // per_page  # Calculate total pages
+    return render_template(
+        "admin_sit_in.html",
+        reservations=reservations,
+        page=page,
+        total_pages=total_pages
+    )
 
-    print("Reservations:", reservations)
-    print("Page:", page)
-    print("Total Pages:", total_pages)
-    print("Fetching reservations for student ID:", idno)
-    reservations = dbhelper.get_student_reservations_paginated(idno, per_page, offset)
-    print("Reservations:", reservations)
+# ADMIN REPORTS
+@app.route('/api/enrollment-data')
+def enrollment_data():
+    weekly_data = get_weekly_enrollment()
+    monthly_data = get_monthly_enrollment()
+    yearly_data = get_yearly_enrollment()
 
+    print("Weekly Data:", weekly_data)
+    print("Monthly Data:", monthly_data)
+    print("Yearly Data:", yearly_data)
 
-    return render_template("student_history_reservation.html",reservations=reservations,page=page,total_pages=total_pages)
+    formatted_data = {
+        'weekly': [entry['count'] for entry in weekly_data],
+        'monthly': [entry['count'] for entry in monthly_data],
+        'yearly': [entry['count'] for entry in yearly_data]
+    }
 
+    return jsonify(formatted_data)
 
+# TOTAL STUDENTS
+@app.route('/api/total-students')
+def total_students():
+    total = count_all_registered_students()
+    return jsonify({"total_students": total})
+
+# TOTAL SIT-IN REQUESTS
+@app.route("/api/total_reservations", methods=["GET"])
+def get_total_reservations():
+    try:
+        total_reservations = dbhelper.count_all_reservations()
+        print("Total Reservations:", total_reservations) 
+        return jsonify({"total_reservations": total_reservations})
+    except Exception as e:
+        print("Error fetching total reservations:", str(e))
+        return jsonify({"error": "Failed to fetch total reservations"}), 500
     
+
+
+@app.route('/admin_enrolled_students', methods=['GET'])
+def admin_enrolled_students():
+    # Fetch enrolled students based on page and search query
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    search_query = request.args.get('search', '', type=str)
+
+    # Get the enrolled students
+    students = get_enrolled_students(page, per_page, search_query)
+
+    # Get the total count of enrolled students for pagination
+    total_students = count_all_registered_students()
+    
+    # Returning data to the template (or as JSON response)
+    return render_template('admin_enrolled_students.html', students=students, total_students=total_students)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 

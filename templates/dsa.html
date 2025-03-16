@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard Reports</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9; }
+        .chart-container { display: flex; gap: 20px; }
+        .chart-box { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); width: 30%; }
+    </style>
+</head>
+<body>
+    <h1>Admin Dashboard Reports</h1>
+
+    <div class="chart-container">
+        <!-- Sit-in Requests Trend -->
+        <div class="chart-box">
+            <canvas id="sitInTrendChart"></canvas>
+        </div>
+
+        <!-- Attendance Trends by Year Level -->
+        <div class="chart-box">
+            <canvas id="attendanceTrendChart"></canvas>
+        </div>
+
+        <!-- Lab Usage Comparison -->
+        <div class="chart-box">
+            <canvas id="labUsageChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Sit-in Requests Trend (Line Chart)
+        new Chart(document.getElementById('sitInTrendChart'), {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+                datasets: [{
+                    label: 'Sit-in Requests',
+                    data: [15, 25, 40, 35, 50],
+                    borderColor: '#5F3B71',
+                    backgroundColor: 'rgba(95, 59, 113, 0.2)',
+                    fill: true
+                }]
+            }
+        });
+
+        // Attendance Trends by Year Level (Stacked Bar Chart)
+        new Chart(document.getElementById('attendanceTrendChart'), {
+            type: 'bar',
+            data: {
+                labels: ['1st Year', '2nd Year', '3rd Year', '4th Year'],
+                datasets: [
+                    { label: 'Lab 1', data: [30, 45, 60, 50], backgroundColor: '#5F3B71' },
+                    { label: 'Lab 2', data: [20, 35, 40, 60], backgroundColor: '#A084AF' }
+                ]
+            },
+            options: { 
+                scales: { x: { stacked: true }, y: { stacked: true } } 
+            }
+        });
+
+        // Lab Usage Comparison (Bar Chart with Progress Indicator)
+        new Chart(document.getElementById('labUsageChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Lab 1', 'Lab 2', 'Lab 3', 'Lab 4'],
+                datasets: [{
+                    label: 'Usage (%)',
+                    data: [70, 55, 85, 40],
+                    backgroundColor: ['#5F3B71', '#A084AF', '#D3BBDD', '#EAD7F7']
+                }]
+            }
+        });
+    </script>
+</body>
+</html>

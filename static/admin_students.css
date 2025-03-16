@@ -16,7 +16,7 @@ body {
 	background: var(--grey);
 	overflow-x: hidden;
     min-height: 100vh;
-    background: linear-gradient(var(--red1) 50%, var(--dark2) 50%);
+    /* background: linear-gradient(var(--red1) 50%, var(--dark2) 50%); */
 }
 
 a {
@@ -333,13 +333,13 @@ nav .profile .profile-link a:hover {
 /* NAVBAR */
 
 .container{
-    
-    padding: 20px;
-    box-shadow: 3px 3px 20px var(--dark1);
-    background: var(--dark3);
+    padding: 40px;
+    width: auto;
+    height: 86vh;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-    margin: 10px;
-    margin-top: 50px;
+    margin: 20px;
 }
 
 .container header .filterEntries{
@@ -455,10 +455,10 @@ table tbody tr:first-child td{
 table tbody tr:nth-child(odd){
     background: var(--dark9);
 }
-
+/* 
 table tbody tr:nth-child(odd) > td:nth-child(3){
     background: var(--dark4);
-}
+} */
 
 table tr td{
     font-size: 15px;
@@ -701,4 +701,220 @@ input::-webkit-outer-spin-button{
     transform: scale(1);
     opacity: 1;
     visibility: visible;
+}
+
+/* Styling for the table */
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 15px;
+    font-family: 'Poppins', sans-serif;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    min-width: 1400px !important;
+}
+
+/* Table header */
+.styled-table thead tr {
+    background-color: #603A7E; /* Matches the sidebar color */
+    color: #ffffff;
+    text-align: center;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Table header cells */
+.styled-table th {
+    padding: 14px 16px;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* Table body rows */
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+    text-align: center;
+    background-color: #f9f9f9;
+}
+
+/* Alternate row colors */
+.styled-table tbody tr:nth-child(odd) {
+    background-color: #f4f4f4;
+}
+
+/* Table body cells */
+.styled-table td {
+    padding: 12px 16px;
+    text-align: center;
+    color: #333333;
+    font-size: 14px;
+}
+
+/* Hover effect for rows */
+.styled-table tbody tr:hover {
+    background-color: #eaeaea;
+    transition: background-color 0.3s ease;
+}
+
+/* Last row without border */
+.styled-table tbody tr:last-of-type {
+    border-bottom: none;
+}
+
+/* Action buttons */
+.styled-table td button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: #603A7E; /* Matches the sidebar color */
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.styled-table td button:hover {
+    color: #2CA58D; /* Slightly brighter color on hover */
+    transform: scale(1.1); /* Slight zoom effect */
+}
+
+/* Responsive table */
+@media screen and (max-width: 768px) {
+    .styled-table {
+        font-size: 13px;
+    }
+
+    .styled-table th, .styled-table td {
+        padding: 10px 12px;
+    }
+}
+
+
+
+/* Header styling */
+.container header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.filterEntries .entries {
+    color: #333333;
+    font-size: 14px;
+}
+
+.filterEntries .entries select,
+.filterEntries .filter input {
+    padding: 8px 12px;
+    border: 1px solid #cccccc;
+    color: #333333;
+    background: #f9f9f9;
+    border-radius: 5px;
+    outline: none;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.filterEntries .entries select:hover,
+.filterEntries .filter input:hover {
+    border-color: #603A7E;
+}
+
+.filterEntries .filter {
+    display: flex;
+    align-items: center;
+}
+
+.filter label {
+    color: #333333;
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+.filter input:focus {
+    border-color: #603A7E;
+    box-shadow: 0 0 4px rgba(96, 58, 126, 0.3);
+}
+
+/* Add Member Button */
+header .addMemberBtn button {
+    padding: 10px 16px;
+    color: #ffffff;
+    background: #603A7E;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+header .addMemberBtn button:hover {
+    background: #2CA58D;
+    transform: scale(1.05);
+}
+
+/* Footer styling */
+.container footer {
+    margin-top: 25px;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container footer span {
+    color: #333333;
+}
+
+footer .pagination button {
+    width: 40px;
+    padding: 8px 0;
+    color: #ffffff;
+    background: #603A7E;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    margin: 0 2px;
+    border-radius: 5px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+footer .pagination button:first-child {
+    width: 85px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    opacity: 1; /* Fully visible */
+    pointer-events: auto; /* Enable click events */
+}
+
+footer .pagination button:last-child {
+    width: 85px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    opacity: 1; /* Fully visible */
+    pointer-events: auto; /* Enable click events */
+}
+
+footer .pagination button:disabled {
+    opacity: 0.6; /* Faded appearance when disabled */
+    cursor: not-allowed; /* Show disabled cursor */
+    pointer-events: none; /* Disable click events when disabled */
+}
+
+
+nav .form-group .search-btn {
+    background: var(--blue); 
+    color: #fff; 
+    border: none;
+    border-radius: 5px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background .3s ease;
+}
+
+nav .form-group .search-btn:hover {
+    background: #603a7ede; 
 }

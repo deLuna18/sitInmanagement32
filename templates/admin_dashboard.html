@@ -35,7 +35,7 @@
                 </a>
             </li>
 			<li>
-                <a href="#">
+                <a href="{{ url_for('admin_sit_in') }}">
                     <span class="icon">
                         <ion-icon name="person-add-outline"></ion-icon>
                     </span>
@@ -87,46 +87,22 @@
                 </a>
             </li>
 		</ul>
-		<!-- <div class="ads">
-			<div class="wrapper">
-				<a href="#" class="btn-upgrade">Upgrade</a>
-				<p>Become a <span>PRO</span> member and enjoy <span>All Features</span></p>
-			</div>
-		</div> -->
 	</section>
-	<!-- SIDEBAR -->
 
-	<!-- NAVBAR -->
+	<!-- SECTION -->
 	<section id="content">
-		<!-- NAVBAR -->
+		<!-- NAVBAR [SUD KAY SEARCH BAR]-->
 		<nav>
-			<!-- SEARCH BAR -->
-			<i class='bx bx-menu toggle-sidebar' ></i>
+			<i class='bx bx-menu toggle-sidebar'></i>
 			<form id="searchForm">
 				<div class="form-group">
 					<input type="text" id="searchInput" placeholder="Search by ID or Last Name...">
 					<button type="button" id="searchBtn" class="search-btn">Search</button>
 				</div>
 			</form>
-			<a href="#" class="nav-link">
-				<i class='bx bxs-bell icon' ></i>
-				<span class="badge">5</span>
-			</a>
-			<a href="#" class="nav-link">
-				<i class='bx bxs-message-square-dots icon' ></i>
-				<span class="badge">8</span>
-			</a>
-			<span class="divider"></span>
-			<div class="profile">
-				<img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8cGVvcGxlfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="">
-				<ul class="profile-link">
-					<li><a href="#"><i class='bx bxs-user-circle icon' ></i> Profile</a></li>
-					<li><a href="#"><i class='bx bxs-cog' ></i> Settings</a></li>
-					<li><a href="#"><i class='bx bxs-log-out-circle' ></i> Logout</a></li>
-				</ul>
-			</div>
 		</nav>
-		<!-- NAVBAR -->
+		
+		<button id="openModalBtn" style="display: none;">Open Sit-In Modal</button>
 
 		<!-- MODAL FOR STUDENT SIT-IN [CONNECTED TO SEARCH BAR] -->
 		<div id="sitInModal" 
@@ -211,51 +187,59 @@
 				</div>
 			</div>
 		</div>
+		<!-- <div id="reservedStudentResults"></div> -->
+
 
 		<!-- MAIN -->
 		<main>
+
+			<!-- DASHBOARD -->
 			<h1 class="title">Dashboard</h1>
 			<ul class="breadcrumbs">
 				<li><a href="#">Home</a></li>
 				<li class="divider">/</li>
 				<li><a href="#" class="active">Dashboard</a></li>
 			</ul>
+
+			<!-- CARD INFO -->
 			<div class="info-data">
+				<!-- TOTAL ENROLLED STUDENTS -->
 				<div class="card">
 					<div class="head">
 						<div>
-							<h2>200</h2>
+							<h2 id="total-students">0</h2> 
 							<p>Total Students</p>
 						</div>
-						<!-- <i class='bx bx-trending-up icon' ></i> -->
-                        <div class="iconBx">
-                            <ion-icon name="school-outline"></ion-icon>
-                        </div>
+						<div class="iconBx">
+							<ion-icon name="school-outline"></ion-icon>
+						</div>
 					</div>
-					<span class="progress" data-value="40%"></span>
+					<span class="progress" data-value="40%" ></span>
 					<span class="label">40%</span>
 				</div>
+
+				<!-- TOTAL RESERVATIONS -->
 				<div class="card">
 					<div class="head">
 						<div>
-							<h2>234</h2>
-							<p>Sit-in Requests</p>
+							<h2 id="total-reservations">0</h2>
+							<p>Reservations</p>
 						</div>
-						<!-- <i class='bx bx-trending-down icon down' ></i> -->
-                        <div class="iconBx">
-                            <ion-icon name="person-add-outline"></ion-icon>
-                        </div>
+						<div class="iconBx">
+							<ion-icon name="person-add-outline"></ion-icon>
+						</div>
 					</div>
-					<span class="progress" data-value="60%"></span>
-					<span class="label">60%</span>
+					<span class="progress" data-value="60%" id="reservations-progress"></span>
+					<span class="label" id="reservations-label">60%</span>
 				</div>
+				
+				<!-- PENDING FEEDBACKS -->
 				<div class="card">
 					<div class="head">
 						<div>
 							<h2>465</h2>
 							<p>Pending Feedbacks</p>
 						</div>
-						<!-- <i class='bx bx-trending-up icon' ></i> -->
                         <div class="iconBx">
                             <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
                         </div>
@@ -263,13 +247,14 @@
 					<span class="progress" data-value="30%"></span>
 					<span class="label">30%</span>
 				</div>
+
+				<!-- UPCOMING RESERVATION -->
 				<div class="card">
 					<div class="head">
 						<div>
 							<h2>235</h2>
 							<p>Upcoming Reservation</p>
 						</div>
-						<!-- <i class='bx bx-trending-up icon' ></i> -->
                         <div class="iconBx">
                             <ion-icon name="calendar-outline"></ion-icon>
                         </div>
@@ -278,7 +263,12 @@
 					<span class="label">80%</span>
 				</div>
 			</div>
+
+			<!-- REPORT AND ANNOUNCEMENT -->
+			<!-- THIS REPORT IS FOR ALL REGISTERED STUDENTS -->
 			<div class="data">
+
+				<!-- REPORT -->
 				<div class="content-data">
 					<div class="head">
 						<h3>REPORT</h3>
@@ -290,20 +280,26 @@
 								<li><a href="#">Remove</a></li>
 							</ul>
 						</div>
+						<select id="timePeriod">
+							<option value="weekly">Weekly</option>
+							<option value="monthly">Monthly</option>
+							<option value="yearly">Yearly</option>
+						</select>
 					</div>
 					<div class="chart">
 						<div id="chart"></div>
 					</div>
 				</div>
-
+				
+				<!-- ANNOUCNEMENT  -->
 				<div class="content-data">
-					<!-- Announcement Header -->
+					<!-- ANNOUNCMENT HEADER -->
 					<div class="head">
 						<h3><i class="fas fa-bullhorn"></i> ANNOUNCEMENTS</h3>
 						<button id="openModal" class="btn btn-add"><i class="fas fa-plus-circle"></i> Add Announcement</button>
 					</div>
 
-					<!-- Announcement List -->
+					<!-- ANNOUNCEMENT LIST -->
 					<div id="announcementList" style="max-height: 400px; overflow-y: auto;">
 						<table id="announcementTable" class="announcement-table">
 							<thead>
@@ -340,88 +336,89 @@
 					</div>	
 				</div>
 
-				<!-- EDIT ANNOUNCEMENT -->
+				<!-- EDIT MODAL ANNOUNCEMENT -->
 				<div id="announ_cusModal" 
 					style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 9999;">
-				
-				<div class="announ_cus-content" 
-						style="
-						background: #ffffff; 
-						width: 100%; 
-						max-width: 420px; 
-						margin: 10% auto; 
-						padding: 30px; 
-						border-radius: 12px; 
-						box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); 
-						text-align: center; 
-						position: relative;">
-							
-					<span class="announ_cus-close-btn" 
+					
+					<div class="announ_cus-content" 
 							style="
-							color: #5F3B71; 
-							position: absolute; 
-							top: 12px; 
-							right: 15px; 
-							font-size: 28px; 
-							cursor: pointer;">
-						&times;
-					</span>
-			
-					<h2 style="
-						color: #5F3B71; 
-						margin-bottom: 20px; 
-						font-size: 22px; 
-						font-weight: 600;">
-						Edit Announcement
-					</h2>
-			
-					<form id="announ_cusForm">
-						<label for="announ_cusContent" style="
-							display: block; 
-							text-align: left; 
-							font-weight: 500; 
-							margin-bottom: 8px;">
-							Announcement Content:
-						</label>
-			
-						<textarea id="announ_cusContent" 
-							rows="5" 
-							placeholder="Enter updated announcement details..." 
-							required 
-							style="
+							background: #ffffff; 
 							width: 100%; 
-							padding: 10px; 
-							border: 2px solid #5F3B71; 
-							border-radius: 8px; 
-							resize: none; 
-							text-align: left; 
-							font-size: 14px;">
-						</textarea>
-						
-						<button type="submit" 
-								class="announ_cus-btn-save"
+							max-width: 500px; 
+							height: 400px;
+							margin: 10% auto; 
+							padding: 30px; 
+							border-radius: 12px; 
+							box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); 
+							text-align: center; 
+							position: relative;">
+								
+						<span class="announ_cus-close-btn" 
 								style="
-									background-color: #5F3B71; 
-									color: #fff; 
-									border: none; 
-									width: 100%; 
-									padding: 12px 0; 
-									margin-top: 15px; 
-									border-radius: 8px; 
-									font-weight: 500; 
-									cursor: pointer;
-									transition: background 0.3s ease;">
-							Save Changes
-						</button>
-					</form>
+								color: #5F3B71; 
+								position: absolute; 
+								top: 12px; 
+								right: 15px; 
+								font-size: 28px; 
+								cursor: pointer;">
+							&times;
+						</span>
+				
+						<h2 style="
+							color: #5F3B71; 
+							margin-bottom: 20px; 
+							font-size: 22px; 
+							font-weight: 600;">
+							Edit Announcement
+						</h2>
+						
+						<!-- FORM ANNOUCNEMENT -->
+						<form id="announ_cusForm">
+							<label for="announ_cusContent" style="
+								display: block; 
+								text-align: left; 
+								font-weight: 500; 
+								margin-bottom: 8px;">
+								Announcement Content:
+							</label>
+				
+							<textarea id="announ_cusContent" 
+								rows="5" 
+								placeholder="Enter updated announcement details..." 
+								required 
+								style="
+								width: 100%; 
+								height: 200px;
+								padding: 10px; 
+								border: 2px solid #5F3B71; 
+								border-radius: 8px; 
+								resize: none; 
+								text-align: left; 
+								font-size: 14px;">
+							</textarea>
+							
+							<button type="submit" 
+									class="announ_cus-btn-save"
+									style="
+										background-color: #5F3B71; 
+										color: #fff; 
+										border: none; 
+										width: 100%; 
+										padding: 12px 0; 
+										margin-top: 15px; 
+										border-radius: 8px; 
+										font-weight: 500; 
+										cursor: pointer;
+										transition: background 0.3s ease;">
+								Save Changes
+							</button>
+						</form>
+					</div>
 				</div>
 			</div>
 
 
-
-				
-				</div>
-
+			</div>
 				<div id="announcementDetailsModal" class="announcement-modal">
 					<div class="announcement-modal-content">
 						<span class="announcement-close" onclick="closeAnnouncementDetailsModal()">&times;</span>
@@ -458,16 +455,13 @@
 						<a href="#" id="cancelAnnouncement" class="btn-cancel">Nevermind, Cancel</a>
 					</div>
 				</form>
-				
-				
 			</div>
 		</main>
-		<!-- MAIN -->
+
 	</section>
-	<!-- NAVBAR -->
-	 <!-- jQuery and DataTables JS -->
+
+	<!-- SCRIPTS -->
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<!-- <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script> -->
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>

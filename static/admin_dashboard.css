@@ -398,26 +398,30 @@ main .card .head .icon {
 main .card .head .icon.down {
 	color: var(--red);
 }
+
 main .card .progress {
-	display: block;
-	margin-top: 24px;
-	height: 10px;
-	width: 100%;
-	border-radius: 10px;
-	background: var(--grey);
-	overflow-y: hidden;
-	position: relative;
-	margin-bottom: 4px;
+    display: block;
+    margin-top: 24px;
+    height: 10px;
+    width: 100%; 
+    border-radius: 10px;
+    background: var(--grey); 
+    overflow: hidden; 
+    position: relative;
+    margin-bottom: 4px;
 }
+
 main .card .progress::before {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: 0;
-	height: 100%;
-	background: var(--gold);
-	width: var(--value);
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: var(--gold);
+    width: var(--value); 
+    transition: width 0.3s ease; 
 }
+
 main .card .label {
 	font-size: 14px;
 	font-weight: 700;
@@ -941,11 +945,6 @@ hr {
 	height: 1px;
 	background: #ddd;
 	margin: 15px 0;
-}
-
-textarea#announ_cusContent {
-    padding: 10px; /* Existing padding */
-    text-align: left; /* Ensure text starts from the left */
 }
 
 #closeModal:hover {

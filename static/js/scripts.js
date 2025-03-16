@@ -1,3 +1,4 @@
+
 // SIDEBAR DROPDOWN
 const allDropdown = document.querySelectorAll('#sidebar .side-dropdown');
 const sidebar = document.getElementById('sidebar');
@@ -20,9 +21,6 @@ allDropdown.forEach(item=> {
 		item.classList.toggle('show');
 	})
 })
-
-
-
 
 
 // SIDEBAR COLLAPSE
@@ -64,9 +62,6 @@ toggleSidebar.addEventListener('click', function () {
 	}
 })
 
-
-
-
 sidebar.addEventListener('mouseleave', function () {
 	if(this.classList.contains('hide')) {
 		allDropdown.forEach(item=> {
@@ -79,8 +74,6 @@ sidebar.addEventListener('mouseleave', function () {
 		})
 	}
 })
-
-
 
 sidebar.addEventListener('mouseenter', function () {
 	if(this.classList.contains('hide')) {
@@ -95,62 +88,6 @@ sidebar.addEventListener('mouseenter', function () {
 	}
 })
 
-
-
-
-// PROFILE DROPDOWN
-const profile = document.querySelector('nav .profile');
-const imgProfile = profile.querySelector('img');
-const dropdownProfile = profile.querySelector('.profile-link');
-
-imgProfile.addEventListener('click', function () {
-	dropdownProfile.classList.toggle('show');
-})
-
-
-
-
-// MENU
-const allMenu = document.querySelectorAll('main .content-data .head .menu');
-
-allMenu.forEach(item=> {
-	const icon = item.querySelector('.icon');
-	const menuLink = item.querySelector('.menu-link');
-
-	icon.addEventListener('click', function () {
-		menuLink.classList.toggle('show');
-	})
-})
-
-
-
-window.addEventListener('click', function (e) {
-	if(e.target !== imgProfile) {
-		if(e.target !== dropdownProfile) {
-			if(dropdownProfile.classList.contains('show')) {
-				dropdownProfile.classList.remove('show');
-			}
-		}
-	}
-
-	allMenu.forEach(item=> {
-		const icon = item.querySelector('.icon');
-		const menuLink = item.querySelector('.menu-link');
-
-		if(e.target !== icon) {
-			if(e.target !== menuLink) {
-				if (menuLink.classList.contains('show')) {
-					menuLink.classList.remove('show')
-				}
-			}
-		}
-	})
-})
-
-
-
-
-
 // PROGRESSBAR
 const allProgress = document.querySelectorAll('main .card .progress');
 
@@ -158,104 +95,129 @@ allProgress.forEach(item=> {
 	item.style.setProperty('--value', item.dataset.value)
 })
 
+// APEXCHART - ENROLLMENT REPORT
+let chart;
 
+    function renderChart(data, categories, title) {
+      const options = {
+        series: [
+          { name: title, data: data },
+        ],
+        chart: { height: 350, type: 'line' },
+        colors: ['#5F3B71'],
+        dataLabels: { enabled: false },
+        stroke: { curve: 'straight', width: 2 },
+        markers: { size: 4, colors: ['#5F3B71'] },
+        xaxis: {
+          categories: categories,
+        },
+        yaxis: {
+          min: 0,
+          max: Math.max(...data) + 5, // Dynamically adjust max value
+          tickAmount: 5,
+        },
+        tooltip: {
+          enabled: true,
+          y: {
+            formatter: function (val) {
+              return "Enrollments: " + val;
+            },
+          },
+        },
+      };
 
+      if (chart) {
+        chart.updateOptions(options);
+      } else {
+        chart = new ApexCharts(document.querySelector("#chart"), options);
+        chart.render();
+      }
+    }
 
+    fetch('/api/enrollment-data')
+      .then((response) => response.json())
+      .then((enrollmentData) => {
+        const timePeriodSelect = document.getElementById('timePeriod');
 
+        timePeriodSelect.addEventListener('change', (event) => {
+          const selectedPeriod = event.target.value;
+          let data, categories, title;
 
-// APEXCHART
-var options = {
-  series: [{
-  name: 'series1',
-  data: [31, 40, 28, 51, 42, 109, 100]
-}, {
-  name: 'series2',
-  data: [11, 32, 45, 32, 34, 52, 41]
-}],
-  chart: {
-  height: 350,
-  type: 'area'
-},
-dataLabels: {
-  enabled: false
-},
-stroke: {
-  curve: 'smooth'
-},
-xaxis: {
-  type: 'datetime',
-  categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
-},
-tooltip: {
-  x: {
-    format: 'dd/MM/yy HH:mm'
-  },
-},
-};
+          if (selectedPeriod === 'weekly') {
+            data = enrollmentData.weekly;
+            categories = Array.from({ length: enrollmentData.weekly.length }, (_, i) => `Week ${i + 1}`);
+            title = 'Weekly Enrollment';
+          } else if (selectedPeriod === 'monthly') {
+            data = enrollmentData.monthly;
+            categories = Array.from({ length: enrollmentData.monthly.length }, (_, i) => `Month ${i + 1}`);
+            title = 'Monthly Enrollment';
+          } else if (selectedPeriod === 'yearly') {
+            data = enrollmentData.yearly;
+            categories = Array.from({ length: enrollmentData.yearly.length }, (_, i) => `Year ${i + 1}`);
+            title = 'Yearly Enrollment';
+          }
 
-var chart = new ApexCharts(document.querySelector("#chart"), options);
-chart.render();
+          renderChart(data, categories, title);
+        });
 
+        // Initial render with weekly data
+        const initialData = enrollmentData.weekly;
+        const initialCategories = Array.from({ length: enrollmentData.weekly.length }, (_, i) => `Week ${i + 1}`);
+        renderChart(initialData, initialCategories, 'Weekly Enrollment');
+      });
 
-
-
+// ANNOUNCEMENT 
 document.addEventListener("DOMContentLoaded", function () {
 
-    // Make sure modal is hidden when page loads
     document.getElementById('announcementForm').style.display = 'none';
 
-    // Open Modal
+    // OPEN MODAL
     document.getElementById('openModal').addEventListener('click', function() {
         document.getElementById('announcementForm').style.display = 'flex';
     });
 
-    // Close Modal (Close button)
+    // CLOSE MODAL (BUTTON)
     document.querySelector('.close')?.addEventListener('click', function() {
         document.getElementById('announcementForm').style.display = 'none';
     });
 
-    // Close Modal (Cancel button)
+    // CLOSE MODAL (CANCEL BUTTON)
     document.getElementById('cancelAnnouncement').addEventListener('click', function(event) {
         event.preventDefault(); 
         console.log("Cancel button clicked!"); 
         document.getElementById('announcementForm').style.display = 'none';
     });
 
-
+	// SAVE ANNOUNCEMENT
 	document.getElementById('saveAnnouncement').addEventListener('click', function() {
-		let titleElement = document.getElementById('announcementFormTitle');
-		let contentElement = document.getElementById('announcementFormContent');
-	
-		console.log("Title Element:", titleElement);  
-		console.log("Content Element:", contentElement);  
-	
-		if (!titleElement || !contentElement) {
-			console.error("Error: Element not found.");
-			return;
-		}
-	
-		let title = titleElement.value.trim();
-		let content = contentElement.value.trim();
-	
-		console.log("Title Value:", title);  
-		console.log("Content Value:", content);  
-	
-		if (title !== "" && content !== "") {
+		console.log("Save button clicked!"); 
+		let title = document.getElementById('announcementFormTitle').value.trim();
+		let content = document.getElementById('announcementFormContent').value.trim();
+		console.log('Title:', title); 
+		console.log('Content:', content); 
+		if (title && content) {
 			fetch('/add_announcement', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-				body: new URLSearchParams({ 'title': title, 'content': content })
+				headers: { 
+					'Content-Type': 'application/json' 
+				},
+				body: JSON.stringify({ 'title': title, 'content': content })
 			})
-			.then(response => response.text())  
+			.then(response => response.json())
 			.then(data => {
-				console.log("Server response:", data);  
-				window.location.reload();
+				console.log("Server response:", data); 
+				if (data.success) {
+					window.location.reload();  
+				} else {
+					alert("Failed to save announcement.");
+				}
 			})
 			.catch(error => console.error("Error:", error));
 		} else {
 			alert("Title and content are required.");
 		}
 	});
+	
 
 	// PARA MA CLICKABLE ANG ROWS
 	$(document).ready(function() {
@@ -353,70 +315,149 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 	// SEARCH BARRRR
-	// SEARCH BARRRR
-	$(document).ready(function() {
-		$('#searchBtn').on('click', function() {
-			var searchValue = $('#searchInput').val().trim();
-	
-			if (searchValue) {
-				$.ajax({
-					url: "/search_reservation",
-					method: "POST",
-					data: { searchValue: searchValue },
-					success: function(response) {
-						if (response.error) {
-							alert(response.error); // Kung walay nakuha nga data
-						} else {
-							$('#idNumber').val(response[0].idNumber);
-							$('#studentName').val(response[0].studentName);
-							$('#purpose').val(response[0].purpose);
-							$('#lab').val(response[0].lab);
-							$('#remainingSessions').val(response[0].remainingSessions);
-	
-							$('#sitInModal').css("display", "flex"); // Show modal
-						}
-					},
-					error: function() {
-						alert("Error fetching reservation data.");
-					}
-				});
-			} else {
-				alert("Please enter a search value.");
-			}
-		});
-	
-		$('#closeModal').on('click', function() {
-			$('#sitInModal').hide(); // Isira ang modal
-		});
-	});
 
 
-	// ACCEPT BUTTON
 
-	$(document).ready(function () {
-		$("#acceptBtn").click(function () {
-			const idNumber = $("#idNumber").val();
-	
-			$.ajax({
-				url: "/accept_reservation",
-				method: "POST",
-				data: { 
-					idNumber: idNumber,
-					status: "Accepted"  // Add this to ensure correct status
-				},
-				success: function (response) {
-					alert(response.message);
-					location.reload();  // Refresh the page to reflect changes
-				},
-				error: function (xhr) {
-					alert(xhr.responseJSON.error);
-				}
-			});
-		});
-	});
-	
+	// TOTAL STUDENTS - KADTUNG PROGRESS BAR SA CARD
+	fetch('/api/total-students')
+    .then(response => response.json())
+    .then(data => {
+        const totalStudents = data.total_students;
 
+        document.getElementById('total-students').textContent = totalStudents;
+
+        const maxCapacity = 200; 
+        const percentage = Math.round((totalStudents / maxCapacity) * 100);
+
+        const progress = document.querySelector('.progress');
+        progress.style.setProperty('--value', `${percentage}%`); 
+        progress.style.width = '100%'; 
+        progress.setAttribute('data-value', `${percentage}%`);
+
+        
+        const label = document.querySelector('.label');
+        label.textContent = `${percentage}%`;
+    })
+    .catch(error => {
+        console.error('Error fetching total students:', error);
+    });
+
+
+
+	// TOTAL RESERVATIONS - KADTUNG PROGRESS BAR SA CARD
+	fetch('/api/total_reservations')
+    .then(response => response.json())
+    .then(data => {
+        const totalReservations = data.total_reservations; 
+		
+        document.getElementById('total-reservations').textContent = totalReservations;
+
+        const maxCapacity = 150; 
+        const percentage = Math.round((totalReservations / maxCapacity) * 100);
+
+       
+        const progress = document.querySelector('.progress');
+        progress.style.setProperty('--value', `${percentage}%`); 
+        progress.style.width = '100%'; 
+        progress.setAttribute('data-value', `${percentage}%`); 
+
+        
+        const label = document.querySelector('.label');
+        label.textContent = `${percentage}%`;
+    })
+    .catch(error => {
+        console.error('Error fetching total reservations:', error);
+    });
 	
 	
 });
 
+// SEARCH RESERVED STUDENTS - Triggers when the search button is clicked
+function searchReservedStudents() {
+    const query = document.getElementById('searchInput').value.trim();
+
+    if (query.length > 0) {
+        fetch(`/search_reserved_students?query=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.students.length > 0) {
+                    const student = data.students[0]; 
+
+                    // Automatically open the modal for the first student result
+                    openSitInModal(student);
+                    document.getElementById('openModalBtn').style.display = 'none';  // Hide the button
+
+                } else {
+                    alert("No reserved students found.");
+                    document.getElementById('openModalBtn').style.display = 'none';  // Hide the button if no results
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching reserved students:', error);
+            });
+    } else {
+        // Hide the button if search input is empty
+        document.getElementById('openModalBtn').style.display = 'none';  
+    }
+}
+
+// SEARCH BUTTON
+document.getElementById('searchBtn').addEventListener('click', searchReservedStudents);
+// FUNCTION TO OPEN MODAL AND POPULATE A STUDENT DATA 
+function openSitInModal(student) {
+    document.getElementById('idNumber').value = student.idno;
+    document.getElementById('studentName').value = student.student_name;
+    document.getElementById('purpose').value = student.purpose;
+    document.getElementById('lab').value = student.lab;
+    document.getElementById('remainingSessions').value = student.remaining_sessions;
+
+    // SHOW MODAL
+    document.getElementById('sitInModal').style.display = 'flex';
+}
+
+// CLOSE MODAL
+document.getElementById('closeModal').onclick = function() {
+    document.getElementById('sitInModal').style.display = 'none';
+};
+
+// ACCEPT BUTTON
+document.getElementById('acceptBtn').onclick = function() {
+    const idNumber = document.getElementById('idNumber').value;
+    fetch(`/accept_reservation`, {
+        method: 'POST',
+        body: new URLSearchParams({ idNumber: idNumber })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error accepting reservation:', error);
+    });
+
+    // CLOSE MODAL AFTER ACCEPTING
+    document.getElementById('sitInModal').style.display = 'none';
+};
+
+// REJECT BUTTON
+document.getElementById('rejectBtn').onclick = function() {
+    const idNumber = document.getElementById('idNumber').value;
+    fetch(`/reject_reservation`, {
+        method: 'POST',
+        body: new URLSearchParams({ idNumber: idNumber })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error rejecting reservation:', error);
+    });
+
+    // CLOSE MODAL
+    document.getElementById('sitInModal').style.display = 'none';
+};

@@ -25,7 +25,7 @@
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a href="{{ url_for('admin_students') }}">
                     <span class="icon">
                         <ion-icon name="school-outline"></ion-icon>
                     </span>
@@ -33,7 +33,7 @@
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a href="{{ url_for('admin_sit_in') }}">
                     <span class="icon">
                         <ion-icon name="person-add-outline"></ion-icon>
                     </span>
@@ -96,32 +96,46 @@
 
     <section id="content">
 		<!-- NAVBAR -->
-		<nav>
-			<i class='bx bx-menu toggle-sidebar' ></i>
-			<form action="#">
-				<div class="form-group">
-					<input type="text" placeholder="Search...">
-					<i class='bx bx-search icon' ></i>
-				</div>
-			</form>
-			<a href="#" class="nav-link">
-				<i class='bx bxs-bell icon' ></i>
-				<span class="badge">5</span>
-			</a>
-			<a href="#" class="nav-link">
-				<i class='bx bxs-message-square-dots icon' ></i>
-				<span class="badge">8</span>
-			</a>
-			<span class="divider"></span>
-			<div class="profile">
-				<img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8cGVvcGxlfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="">
-				<ul class="profile-link">
-					<li><a href="#"><i class='bx bxs-user-circle icon' ></i> Profile</a></li>
-					<li><a href="#"><i class='bx bxs-cog' ></i> Settings</a></li>
-					<li><a href="#"><i class='bx bxs-log-out-circle' ></i> Logout</a></li>
-				</ul>
-			</div>
-		</nav>
+    <nav>
+        <i class='bx bx-menu toggle-sidebar'></i>
+
+     
+
+        <!-- Modal for Student Sit-In [Connected to Search Bar] -->
+        <div id="sitInModal" 
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; justify-content: center; align-items: center;">
+            <div class="modal-content" 
+                style="background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); width: 100%; max-width: 500px;">
+                <h2>Sit In Form</h2>
+                <label>ID Number:</label>
+                <input type="text" id="idNumber" readonly>
+
+                <label>Student Name:</label>
+                <input type="text" id="studentName" readonly>
+
+                <label>Purpose:</label>
+                <input type="text" id="purpose" readonly>
+
+                <label>Lab:</label>
+                <input type="text" id="lab" readonly>
+
+                <label>Remaining Sessions:</label>
+                <input type="text" id="remainingSessions" readonly>
+
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button id="closeModal" style="background-color: #d9534f; color: #fff; border: none; border-radius: 5px; padding: 8px 20px; cursor: pointer; transition: background 0.3s ease;">
+                        Close
+                    </button>
+                    <button id="acceptBtn" style="background-color: #5cb85c; color: #fff; border: none; border-radius: 5px; padding: 8px 20px; cursor: pointer; transition: background 0.3s ease;">
+                        Accept
+                    </button>
+                    <button id="rejectBtn" style="background-color: #f0ad4e; color: #fff; border: none; border-radius: 5px; padding: 8px 20px; cursor: pointer; transition: background 0.3s ease;">
+                        Reject
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
 		<!-- NAVBAR -->
     
     <div class="container">
@@ -138,11 +152,29 @@
                     </select> entries
                 </div>
 
-                <div class="filter">
-                    <label for="search">Search:</label>
-                    <input type="search" name="" id="search" placeholder="Enter name/city/post">
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search by name, ID, or email (Enrolled Students)">
+                    <button onclick="searchEnrolledStudents()">Search</button>
                 </div>
+
+                <script>
+                    // Function to perform search
+                    function searchEnrolledStudents() {
+                        const searchInput = document.getElementById('searchInput').value;
+                        // Reload the page with the search query and reset to page 1
+                        window.location.href = `/admin_students?page=1&search=${encodeURIComponent(searchInput)}`;
+                    }
+                    
+                    // Function to reset the search, remove search query from URL, and reload the page
+                    function resetSearch() {
+                        // Clear the search input field
+                        document.getElementById('searchInput').value = '';
+                        // Reload the page without the search query (i.e., showing all students)
+                        window.location.href = '/admin_students?page=1';  // Reset to the first page with no search
+                    }
+                </script>
             </div>
+
 
             <div class="addMemberBtn">
                 <button>New member</button>
@@ -151,201 +183,82 @@
         </header>
 
 
-        <table>
-
+        <table class="styled-table">
             <thead>
                 <tr class="heading">
-                    <th>SL No</th>
-                    <th>Picture</th>
+                    <th>ID No</th>
                     <th>Full Name</th>
-                    <th>Age</th>
-                    <th>City</th>
-                    <th>Position</th>
-                    <th>Salary</th>
-                    <th>Start Date</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Action</th>
+                    <th>Course</th>
+                    <th>Year Level</th>
+                    <th>Email Address</th>
+                    <th>Username</th>
                 </tr>
             </thead>
-
-
-            <tbody class="userInfo">
-                <!-- <tr><td class="empty" colspan="11" align="center">No data available in table</td></tr> -->
-                <!-- <tr>
-                    <td>1</td>
-                    <td><img src="./img/pic1.png" alt="" width="40" height="40"></td>
-                    <td>John Doe</td>
-                    <td>30</td>
-                    <td>New York</td>
-                    <td>Front-End Developer</td>
-                    <td>$25000</td>
-                    <td>03-08-2010</td>
-                    <td>jhondoe.net111@gmail.com</td>
-                    <td>924157812</td>
-                    <td>
-                        <button><i class="fa-regular fa-eye"></i></button>
-                        <button><i class="fa-regular fa-pen-to-square"></i></button>
-                        <button><i class="fa-regular fa-trash-can"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td><img src="./img/pic1.png" alt="" width="40" height="40"></td>
-                    <td>John Doe</td>
-                    <td>30</td>
-                    <td>New York</td>
-                    <td>Front-End Developer</td>
-                    <td>$25000</td>
-                    <td>03-08-2010</td>
-                    <td>jhondoe.net111@gmail.com</td>
-                    <td>924157812</td>
-                    <td>
-                        <button><i class="fa-regular fa-eye"></i></button>
-                        <button><i class="fa-regular fa-pen-to-square"></i></button>
-                        <button><i class="fa-regular fa-trash-can"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td><img src="./img/pic1.png" alt="" width="40" height="40"></td>
-                    <td>John Doe</td>
-                    <td>30</td>
-                    <td>New York</td>
-                    <td>Front-End Developer</td>
-                    <td>$25000</td>
-                    <td>03-08-2010</td>
-                    <td>jhondoe.net111@gmail.com</td>
-                    <td>924157812</td>
-                    <td>
-                        <button><i class="fa-regular fa-eye"></i></button>
-                        <button><i class="fa-regular fa-pen-to-square"></i></button>
-                        <button><i class="fa-regular fa-trash-can"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td><img src="./img/pic1.png" alt="" width="40" height="40"></td>
-                    <td>John Doe</td>
-                    <td>30</td>
-                    <td>New York</td>
-                    <td>Front-End Developer</td>
-                    <td>$25000</td>
-                    <td>03-08-2010</td>
-                    <td>jhondoe.net111@gmail.com</td>
-                    <td>924157812</td>
-                    <td>
-                        <button><i class="fa-regular fa-eye"></i></button>
-                        <button><i class="fa-regular fa-pen-to-square"></i></button>
-                        <button><i class="fa-regular fa-trash-can"></i></button>
-                    </td>
-                </tr> -->
+            <tbody>
+                {% for student in students %}
+                    {% if student.idno != '428237351' %}
+                        <tr>
+                            <td>{{ student.idno }}</td>
+                            <td>{{ student.firstname }} {{ student.lastname }}</td>
+                            <td>{{ student.course }}</td>
+                            <td>{{ student.year_level }}</td>
+                            <td>{{ student.email_address }}</td>
+                            <td>{{ student.username }}</td>
+                        </tr>
+                    {% endif %}
+                {% else %}
+                    <tr>
+                        <td colspan="6">No students found.</td>
+                    </tr>
+                {% endfor %}
             </tbody>
-
         </table>
+        
 
 
         <footer>
-            <span class="showEntries">Showing 1 to 10 of 50 entries</span>
-            <div class="pagination">
-                <!-- <button>Prev</button>
-                <button class="active">1</button>
-                <button>2</button>
-                <button>3</button>
-                <button>4</button>
-                <button>5</button>
-                <button>Next</button> -->
+            <div class="pagination" 
+                 style="display: flex; justify-content: center; align-items: center; gap: 20px; padding: 20px 0; width: 100%; text-align: center;">
+                <!-- Previous Button -->
+                {% if page > 1 %}
+                    <a href="{{ url_for('admin_students', page=page-1, search=search_query) }}" 
+                       style="display: flex; justify-content: center; align-items: center; padding: 10px 20px; background-color: #603A7E; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;">
+                        Prev
+                    </a>
+                {% else %}
+                    <span style="display: flex; justify-content: center; align-items: center; padding: 10px 20px; background-color: #e0e0e0; color: #ccc; border-radius: 5px; font-weight: bold;">
+                        Prev
+                    </span>
+                {% endif %}
+        
+                <!-- Page Indicator -->
+                <span style="font-size: 16px; color: #603A7E; font-weight: bold;">
+                    Showing {{ start }} to {{ end }} of {{ total_students }} entries
+                </span>
+        
+                <!-- Next Button -->
+                {% if page < total_pages %}
+                    <a href="{{ url_for('admin_students', page=page+1, search=search_query) }}" 
+                       style="display: flex; justify-content: center; align-items: center; padding: 10px 20px; background-color: #603A7E; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;">
+                        Next
+                    </a>
+                {% else %}
+                    <span style="display: flex; justify-content: center; align-items: center; padding: 10px 20px; background-color: #e0e0e0; color: #ccc; border-radius: 5px; font-weight: bold;">
+                        Next
+                    </span>
+                {% endif %}
             </div>
         </footer>
+        
+        
     </div>
 
-
-    <!--Popup Form-->
-
-    <div class="dark_bg">
-
-        <div class="popup">
-             <header>
-                <h2 class="modalTitle">Fill the Form</h2>
-                <button class="closeBtn">&times;</button>
-             </header>
-
-             <div class="body">
-                <form action="#" id="myForm">
-                    <div class="imgholder">
-                        <label for="uploadimg" class="upload">
-                            <input type="file" name="" id="uploadimg" class="picture">
-                            <i class="fa-solid fa-plus"></i>
-                        </label>
-                        <img src="./img/pic1.png" alt="" width="150" height="150" class="img">
-                    </div>
-
-                    <div class="inputFieldContainer">
-
-                        <div class="nameField">
-                            <div class="form_control">
-                                <label for="fName">First Name:</label>
-                                <input type="text" name="" id="fName" required>
-                            </div>
-
-                            <div class="form_control">
-                                <label for="lName">Last Name:</label>
-                                <input type="text" name="" id="lName" required>
-                            </div>
-                        </div>
-
-                        <div class="ageCityField">
-                            <div class="form_control">
-                                <label for="age">Age:</label>
-                                <input type="number" name="" id="age" required>
-                            </div>
-
-                            <div class="form_control">
-                                <label for="city">City:</label>
-                                <input type="text" name="" id="city" required>
-                            </div>
-                        </div>
-
-                        <div class="postSalary">
-                            <div class="form_control">
-                                <label for="position">Position:</label>
-                                <input type="text" name="" id="position" required>
-                            </div>
-
-                            <div class="form_control">
-                                <label for="salary">Salary:</label>
-                                <input type="text" name="" id="salary" required>
-                            </div>
-                        </div>
-
-                        <div class="form_control">
-                            <label for="sDate">Start Date:</label>
-                            <input type="date" name="" id="sDate" required>
-                        </div>
-
-                        <div class="form_control">
-                            <label for="email">Email:</label>
-                            <input type="email" name="" id="email" required>
-                        </div>
-
-                        <div class="form_control">
-                            <label for="phone">Phone:</label>
-                            <input type="number" name="" id="phone" required>
-                        </div>
-                    </div>
-                </form>
-             </div>
-
-             <footer class="popupFooter">
-                <button form="myForm" class="submitBtn">Submit</button>
-             </footer>
-        </div>
-
-    </div>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="../static/js/admin_students.js"></script>
+
+    
     
 </body>
 </html>
