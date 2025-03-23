@@ -205,18 +205,17 @@ window.onload = fetchAllRegisteredStudents;
 
 // ============================== ENTRIES DROPDOWN FUNCTIONALITY =================================
 
-// Get the dropdown element
+//DROPDOWN
 const entriesDropdown = document.getElementById('table_size');
 
-// Add event listener to the dropdown
 entriesDropdown.addEventListener('change', function () {
-    const selectedValue = parseInt(this.value); // Get the selected value (10, 20, 50, 100)
-    perPage = selectedValue; // Update the global perPage variable
-    currentPage = 1; // Reset to the first page
-    searchRegisteredStudents(currentPage); // Re-fetch data with the new limit
+    const selectedValue = parseInt(this.value); 
+    perPage = selectedValue; 
+    currentPage = 1; 
+    searchRegisteredStudents(currentPage); 
 });
 
-// Update the fetchAllRegisteredStudents and searchRegisteredStudents functions to use the global perPage variable
+// FETCH
 async function fetchAllRegisteredStudents(page = 1) {
     try {
         const response = await fetch(`/search_registered_students?page=${page}&per_page=${perPage}`);
@@ -229,6 +228,7 @@ async function fetchAllRegisteredStudents(page = 1) {
     }
 }
 
+// SEARCH
 async function searchRegisteredStudents(page = 1) {
     const query = document.getElementById('registeredSearchInput').value.trim();
 

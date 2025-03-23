@@ -383,20 +383,18 @@ function searchReservedStudents() {
                 if (data.students.length > 0) {
                     const student = data.students[0]; 
 
-                    // Automatically open the modal for the first student result
                     openSitInModal(student);
-                    document.getElementById('openModalBtn').style.display = 'none';  // Hide the button
+                    document.getElementById('openModalBtn').style.display = 'none'; 
 
                 } else {
                     alert("No reserved students found.");
-                    document.getElementById('openModalBtn').style.display = 'none';  // Hide the button if no results
+                    document.getElementById('openModalBtn').style.display = 'none';  
                 }
             })
             .catch(error => {
                 console.error('Error fetching reserved students:', error);
             });
     } else {
-        // Hide the button if search input is empty
         document.getElementById('openModalBtn').style.display = 'none';  
     }
 }

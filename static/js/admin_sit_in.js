@@ -67,15 +67,14 @@ sidebar.addEventListener('mouseenter', function () {
 });
 
 // ============================== TABLE FUNCTIONALITY =================================
-  // ============================== TABLE FUNCTIONALITY =================================
-  let currentPage = 1;
-  let perPage = 5;
+let currentPage = 1;
+let perPage = 5;
 
-  // Function to fetch and display reserved students
+  // FETCH RESERVED STUDENTS
   async function fetchReservedStudents(page = 1) {
     try {
         const url = `/api/reserved_students?page=${page}&per_page=${perPage}`;
-        console.log("Fetching data from:", url); // Debugging
+        console.log("Fetching data from:", url); 
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -83,7 +82,7 @@ sidebar.addEventListener('mouseenter', function () {
         }
 
         const data = await response.json();
-        console.log("Fetched data:", data); // Debugging
+        console.log("Fetched data:", data); 
 
         displayReservedStudents(data.students);
         updatePagination(data.total_students, data.page, data.per_page);
@@ -93,15 +92,15 @@ sidebar.addEventListener('mouseenter', function () {
     }
 }
 
-  // Function to display reserved students in the table
+//   DISPLAY
   function displayReservedStudents(students) {
     const tbody = document.getElementById('reservedStudentsTableBody');
-    tbody.innerHTML = ''; // Clear the table body
+    tbody.innerHTML = ''; 
 
     if (students.length === 0) {
         const row = document.createElement('tr');
         const cell = document.createElement('td');
-        cell.setAttribute('colspan', '10'); // Adjust colspan based on the number of columns
+        cell.setAttribute('colspan', '10'); 
         cell.textContent = 'No reserved students found.';
         cell.style.textAlign = 'center';
         cell.style.padding = '20px';
@@ -134,10 +133,10 @@ sidebar.addEventListener('mouseenter', function () {
     }
 }
 
-  // Update the pagination function to handle reserved students
+//   UPDATE PAGINATION
   function updatePagination(total, page, perPage) {
 	  const paginationDiv = document.getElementById('pagination');
-	  paginationDiv.innerHTML = ''; // Clear existing pagination buttons
+	  paginationDiv.innerHTML = ''; 
 
 	  const totalPages = Math.ceil(total / perPage);
 
@@ -190,27 +189,22 @@ sidebar.addEventListener('mouseenter', function () {
 	  }
   }
 
-  // Fetch reserved students when the page loads
   window.onload = function () {
-	  fetchReservedStudents(currentPage); // Fetch the first page of reserved students
+	  fetchReservedStudents(currentPage); 
   };
 
   // ============================== ENTRIES DROPDOWN FUNCTIONALITY =================================
-
-  // Get the dropdown element
+// DROPDOWN
   const entriesDropdown = document.getElementById('table_size');
 
-  // Add event listener to the dropdown
   entriesDropdown.addEventListener('change', function () {
-	  const selectedValue = parseInt(this.value); // Get the selected value (10, 20, 50, 100)
-	  perPage = selectedValue; // Update the global perPage variable
-	  currentPage = 1; // Reset to the first page
-	  fetchReservedStudents(currentPage); // Re-fetch data with the new limit
+	  const selectedValue = parseInt(this.value); 
+	  perPage = selectedValue; 
+	  currentPage = 1; 
+	  fetchReservedStudents(currentPage); 
   });
 
   // ============================== SEARCH FUNCTIONALITY =================================
-
-  // Function to search registered students
   function searchRegisteredStudents() {
 	  const query = document.getElementById('registeredSearchInput').value.trim();
 	  if (query.length > 0) {
@@ -223,13 +217,12 @@ sidebar.addEventListener('mouseenter', function () {
 				  console.error('Error searching reserved students:', error);
 			  });
 	  } else {
-		  fetchReservedStudents(currentPage); // Reset to the original list if search is empty
+		  fetchReservedStudents(currentPage); 
 	  }
   }
 
   // ============================== MODAL FUNCTIONALITY =================================
 
-  // Function to open the modal with student details
   function openSitInModal(student) {
 	  document.getElementById('idNumber').value = student.idno;
 	  document.getElementById('studentName').value = student.student_name;
@@ -237,57 +230,91 @@ sidebar.addEventListener('mouseenter', function () {
 	  document.getElementById('lab').value = student.lab;
 	  document.getElementById('remainingSessions').value = student.remaining_sessions;
 
-	  // Show the modal
 	  document.getElementById('sitInModal').style.display = 'flex';
   }
 
-  // Close the modal
   document.getElementById('closeModal').onclick = function() {
 	  document.getElementById('sitInModal').style.display = 'none';
   };
 
-// Accept reservation
+// ACCEPT RESERVATION
 function acceptReservation(idno) {
-    fetch(`/accept_reservation`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({ idno: idno })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message) {
-            alert(data.message);
-            fetchReservedStudents(currentPage); 
-        }
-    })
-    .catch(error => {
-        console.error('Error accepting reservation:', error);
-    });
+    if (confirm("Are you sure you want to accept this reservation?")) {
+        fetch(`/accept_reservation`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ idno: idno })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                console.log("Reservation accepted. Removing row from table..."); 
+                removeRowFromTable(idno);
+            } else if (data.error) {
+                alert(data.error); 
+            }
+        })
+        .catch(error => {
+            console.error('Error accepting reservation:', error);
+            alert("An error occurred while accepting the reservation. Please try again.");
+        });
+    }
 }
 
-// Reject reservation
+// REJECT RESERVATION
 function rejectReservation(idno) {
-    fetch(`/reject_reservation`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({ idno: idno })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message) {
-            alert(data.message);
-            fetchReservedStudents(currentPage); 
-        }
-    })
-    .catch(error => {
-        console.error('Error rejecting reservation:', error);
-    });
+    if (confirm("Are you sure you want to reject this reservation?")) {
+        fetch(`/reject_reservation`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ idno: idno })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                console.log("Reservation rejected. Removing row from table..."); 
+                removeRowFromTable(idno);
+            } else if (data.error) {
+                alert(data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error rejecting reservation:', error);
+            alert("An error occurred while rejecting the reservation. Please try again.");
+        });
+    }
 }
 
+// REMOVE ROW
+function removeRowFromTable(idno) {
+    const tbody = document.getElementById('reservedStudentsTableBody');
+    const rows = tbody.getElementsByTagName('tr');
+
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const rowIdno = row.cells[0].textContent; 
+        if (rowIdno === idno) {
+            tbody.removeChild(row); 
+            break;
+        }
+    }
+}
 // RESET SESSION
 function resetSessions(idno) {
     if (confirm("Are you sure you want to reset this student's sessions?")) {

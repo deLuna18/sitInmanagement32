@@ -105,6 +105,9 @@ def update_student_profile(username: str, firstname: str, middlename: str, lastn
 
 
 
+
+
+
 # CREATE AND DISPLAY STUDENT RESERVATION (STUDENT RESERVATION & STUDENT HISTORY INFORMATION) 
 # CREATE A STUDENT RESERVATION 
 def create_reservation(idno: int, student_name: str, course: str, year_level: str, purpose: str, lab: str, time_in: str, date: str, sessions: int) -> bool:
@@ -147,33 +150,20 @@ def get_all_reservations_paginated(per_page, offset):
     """
     return getprocess(sql, (per_page, offset))
 
+# UPDATE RESERVATION STATUS
 def update_reservation_status(idno: int, status: str) -> bool:
-    """
-    Update the status of a reservation in the database.
-
-    Args:
-        idno (int): The ID number of the student whose reservation is being updated.
-        status (str): The new status to set for the reservation (e.g., "Accepted" or "Rejected").
-
-    Returns:
-        bool: True if the update was successful, False otherwise.
-    """
     try:
-        # SQL query to update the reservation status
         sql = "UPDATE reservations SET status = ? WHERE idno = ?"
-        
-        # Execute the query with the provided parameters
         result = postprocess(sql, (status, idno))
         
-        # Check if the update was successful
         if result:
             print(f"Reservation status updated successfully for ID {idno} to '{status}'.")
             return True
         else:
             print(f"Failed to update reservation status for ID {idno}.")
             return False
+        
     except Exception as e:
-        # Log the error and return False
         print(f"Error updating reservation status for ID {idno}: {e}")
         return False
 
@@ -195,6 +185,7 @@ def count_all_reservations(search_query=''):
     return result[0]["total"] if result else 0
 
 
+# COUNT STUDENT RESERVATIONS
 def count_student_reservations(idno: int) -> int:
     sql = "SELECT COUNT(*) AS total FROM reservations WHERE idno = ?"
     result = getprocess(sql, (idno,))
@@ -205,7 +196,7 @@ def count_student_reservations(idno: int) -> int:
 
 
 
-
+# GET RESERVATION BY ID OR NAME
 def get_reservation_by_id_or_student(search_value):
     query = """
     SELECT idno, student_name, purpose, lab, remaining_sessions
@@ -215,9 +206,6 @@ def get_reservation_by_id_or_student(search_value):
     result = getprocess(query, (search_value, f"%{search_value}%"))
     print("Database Result:", result)
     return result if result else []
-
-
-
 
 # GET RESERVATION BY ID
 def get_reservation_by_id(id_number: str) -> dict:
@@ -230,6 +218,7 @@ def update_reservation_status(idno: int, status: str) -> bool:
     sql = "UPDATE reservations SET status = ? WHERE idno = ?"
     return postprocess(sql, (status, idno))
 
+# UPDATE RESERVATION SESSIONS
 def update_reservation_sessions(idno: int, remaining_sessions: int) -> bool:
     try:
         sql = "UPDATE reservations SET remaining_sessions = ? WHERE idno = ?"
@@ -244,7 +233,7 @@ def update_reservation_sessions(idno: int, remaining_sessions: int) -> bool:
         print(f"Error updating remaining sessions for ID {idno}: {e}")
         return False
 
-
+# UPDATE RESERVATION STATUS AND SESSIONS
 def update_reservation_status_and_sessions(idno: int, status: str, remaining_sessions: int) -> bool:
     try:
         sql = "UPDATE reservations SET status = ?, remaining_sessions = ? WHERE idno = ?"
@@ -260,8 +249,6 @@ def update_reservation_status_and_sessions(idno: int, status: str, remaining_ses
         print(f"Error updating reservation status and sessions for ID {idno}: {e}")
         return False
 
-
-
 # RESERVATION TABLE NA MO LINK SA STUDENT RESERVATION
 def get_students_with_reservations(query: str) -> list:
     sql = """
@@ -272,8 +259,6 @@ def get_students_with_reservations(query: str) -> list:
     """
     search_pattern = f"%{query}%"
     return getprocess(sql, (search_pattern, search_pattern))
-
-
 
 # UPDATE USER SESSION
 def update_user_sessions(idno: int, sessions: int) -> bool:
@@ -290,11 +275,22 @@ def update_user_sessions(idno: int, sessions: int) -> bool:
         print(f"Error updating sessions for ID {idno}: {e}")
         return False
 
+# GET USER BY IDNO NEEDED KAYNIIIII PARA ASA RESERVATION
 def get_user_by_idno(idno: int) -> dict:
     sql = "SELECT * FROM users WHERE idno = ?"
     result = getprocess(sql, (idno,))
     return result[0] if result else {}
 
+
+
+def get_all_reservations_with_status(per_page, offset):
+    sql = """
+    SELECT idno, student_name, course, year_level, purpose, lab, time_in, date, remaining_sessions, status
+    FROM reservations
+    ORDER BY date DESC
+    LIMIT ? OFFSET ?
+    """
+    return getprocess(sql, (per_page, offset))
 
 
 

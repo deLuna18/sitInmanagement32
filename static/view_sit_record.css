@@ -1057,3 +1057,26 @@ footer #pagination button:last-child {
     object-fit: cover;
     border: 2px solid #603A7E; 
 }
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.status-accepted {
+    background-color: #28a745; /* Green */
+    color: white;
+}
+
+.status-rejected {
+    background-color: #dc3545; /* Red */
+    color: white;
+}
+
+.status-pending {
+    background-color: #ffc107; /* Yellow */
+    color: black;
+}
