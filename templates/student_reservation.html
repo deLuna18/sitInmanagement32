@@ -142,7 +142,7 @@
     <div class="form-container">
         <form method="POST" action="{{ url_for('student_reservation') }}">
             
-            <!-- Personal Information Section -->
+            <!-- PERSONAL INFORMATION SECTION -->
             <div class="section">
                 <div class="section-title">Personal Information</div>
                 <div class="form-group">
@@ -155,7 +155,7 @@
                 </div>
             </div>
 
-            <!-- Academic Information Section -->
+            <!-- ACADEMIC INFORMATION SECTION -->
             <div class="section">
                 <div class="section-title">Academic Information</div>
                 <div class="form-group">
@@ -168,7 +168,7 @@
                 </div>
             </div>
 
-            <!-- Reservation Details Section -->
+            <!-- RESERVATION DETAILES SECTION -->
             <div class="section">
                 <div class="section-title">Reservation Details</div>
                 <div class="form-group">
@@ -180,6 +180,10 @@
                     <input type="text" name="lab" placeholder="Enter Lab Number" required>
                 </div>
                 <div class="form-group">
+                    <label>Remaining Sessions:</label>
+                    <input type="text" value="{{ student.sessions }}" disabled>
+                </div>                
+                <div class="form-group">
                     <label>Time In:</label>
                     <input type="time" name="time_in" required>
                 </div>
@@ -189,6 +193,7 @@
                 </div>
             </div>
 
+            <!-- BUTTON -->
             <button type="submit" class="reserve-btn">Reserve</button>
 
         </form>

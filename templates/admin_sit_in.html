@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>Admin_Students</title>
-    <link rel="stylesheet" href="../static/admin_students.css">
+    <link rel="stylesheet" href="../static/admin_sit_in.css">
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
-
 </head>
 <body>
     <!-- SIDEBAR -->
@@ -42,7 +41,7 @@
             </li>
             <li class="divider" data-text="Reports">Reports</li>
             <li>
-                <a href="#">
+                <a href="{{ url_for('view_sit_record') }}">
                     <span class="icon">
                         <ion-icon name="documents-outline"></ion-icon>
                     </span>
@@ -85,157 +84,181 @@
                 </a>
             </li>
         </ul>
+        <!-- <div class="ads">
+            <div class="wrapper">
+                <a href="#" class="btn-upgrade">Upgrade</a>
+                <p>Become a <span>PRO</span> member and enjoy <span>All Features</span></p>
+            </div>
+        </div> -->
     </section>
     <!-- SIDEBAR -->
 
     <section id="content">
-        
-		<!-- NAVBAR -->
+	
+        <!-- NAVBAR [SUD KAY SEARCH BAR]-->
 		<nav>
-			<i class='bx bx-menu toggle-sidebar' ></i>
-			<!-- Search Bar for Reserved Students -->
-            <i class='bx bx-menu toggle-sidebar'></i>
-            <div class="search-container">
-                <input type="text" id="reservationSearchInput" placeholder="Search by name, ID, or email (Reserved Students)">
-                <button id="searchReservationsBtn" class="search-btn">Search</button>
-            </div>
-
-            <!-- MODAL FOR STUDENT SIT-IN [CONNECTED TO SEARCH BAR] -->
-            <div id="sitInModal" 
-                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; justify-content: center; align-items: center;">
-                <div class="modal-content" 
-                    style="background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); width: 100%; max-width: 500px;">
-                    <h2>Sit In Form</h2>
-                    <label>ID Number:</label>
-                    <input type="text" id="idNumber" readonly>
-
-                    <label>Student Name:</label>
-                    <input type="text" id="studentName" readonly>
-
-                    <label>Purpose:</label>
-                    <input type="text" id="purpose" readonly>
-
-                    <label>Lab:</label>
-                    <input type="text" id="lab" readonly>
-
-                    <label>Remaining Sessions:</label>
-                    <input type="text" id="remainingSessions" readonly>
-
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button id="closeModal" style="background-color: #d9534f; color: #fff; border: none; border-radius: 5px; padding: 8px 20px; cursor: pointer; transition: background 0.3s ease;">
-                            Close
-                        </button>
-                        <button id="acceptBtn" style="background-color: #5cb85c; color: #fff; border: none; border-radius: 5px; padding: 8px 20px; cursor: pointer; transition: background 0.3s ease;">
-                            Accept
-                        </button>
-                        <button id="rejectBtn" style="background-color: #f0ad4e; color: #fff; border: none; border-radius: 5px; padding: 8px 20px; cursor: pointer; transition: background 0.3s ease;">
-                            Reject
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-
-			<!-- <a href="#" class="nav-link">
-				<i class='bx bxs-bell icon' ></i>
-				<span class="badge">5</span>
-			</a>
-			<a href="#" class="nav-link">
-				<i class='bx bxs-message-square-dots icon' ></i>
-				<span class="badge">8</span>
-			</a>
-			<span class="divider"></span>
-			<div class="profile">
-				<img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8cGVvcGxlfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="">
-				<ul class="profile-link">
-					<li><a href="#"><i class='bx bxs-user-circle icon' ></i> Profile</a></li>
-					<li><a href="#"><i class='bx bxs-cog' ></i> Settings</a></li>
-					<li><a href="#"><i class='bx bxs-log-out-circle' ></i> Logout</a></li>
-				</ul>
-			</div> -->
+			<i class='bx bx-menu toggle-sidebar'></i>
+			<form id="searchForm">
+				<div class="form-group">
+					<input type="text" id="searchInput" placeholder="Search by ID or Last Name...">
+					<button type="button" id="searchBtn" class="search-btn">Search</button>
+				</div>
+			</form>
 		</nav>
-		<!-- NAVBAR -->
+		
+		<button id="openModalBtn" style="display: none;">Open Sit-In Modal</button>
+
+		<!-- MODAL FOR STUDENT SIT-IN [CONNECTED TO SEARCH BAR] -->
+		<div id="sitInModal" 
+			style="
+				display: none;
+				position: fixed; 
+				top: 0; 
+				left: 0; 
+				width: 100%; 
+				height: 100%; 
+				background-color: rgba(0, 0, 0, 0.5); 
+				z-index: 9999; /* Highest priority */
+				justify-content: center; 
+				align-items: center;
+				
+				
+
+				">
+
+			<div class="modal-content" 
+				style="
+					
+					background-color: #fff; 
+					padding: 20px; 
+					border-radius: 10px; 
+					box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); 
+					width: 100%; 
+					max-width: 500px;
+					">
+					
+					
+				<h2>Sit In Form</h2>
+			
+				<label>ID Number:</label>
+				<input type="text" id="idNumber" readonly>
+
+				<label>Student Name:</label>
+				<input type="text" id="studentName" readonly>
+
+				<label>Purpose:</label>
+				<input type="text" id="purpose" readonly>
+
+				<label>Lab:</label>
+				<input type="text" id="lab" readonly>
+
+				<label>Remaining Sessions:</label>
+				<input type="text" id="remainingSessions" readonly>
+
+				<div style="display: flex; gap: 10px; margin-top: 10px;">
+					<button id="closeModal" style="
+						background-color: #d9534f; 
+						color: #fff; 
+						border: none; 
+						border-radius: 5px; 
+						padding: 8px 20px; 
+						cursor: pointer;
+						transition: background 0.3s ease;">
+						Close
+					</button>
+				
+					<button id="acceptBtn" style="
+						background-color: #5cb85c; 
+						color: #fff; 
+						border: none; 
+						border-radius: 5px; 
+						padding: 8px 20px; 
+						cursor: pointer;
+						transition: background 0.3s ease;">
+						Accept
+					</button>
+				
+					<button id="rejectBtn" style="
+						background-color: #f0ad4e; 
+						color: #fff; 
+						border: none; 
+						border-radius: 5px; 
+						padding: 8px 20px; 
+						cursor: pointer;
+						transition: background 0.3s ease;">
+						Reject
+					</button>
+				</div>
+			</div>
+		</div>
     
+    <!-- CONTAINER  -->
     <div class="container">
-
+        <!-- HEADER -->
         <header>
-
             <div class="filterEntries">
+                <!-- ENTRIES -->
                 <div class="entries">
-                    Show <select name="" id="table_size">
+                    Show 
+                    <select name="" id="table_size">
+                        <option value="5">5</option>
                         <option value="10">10</option>
                         <option value="20">20</option>
                         <option value="50">50</option>
                         <option value="100">100</option>
-                    </select>  entries
+                    </select> entries
+                </div>
+            
+                <!-- SEARCH BAR -->
+                <div class="search-container">
+                    <input type="text" id="registeredSearchInput" placeholder="Search by name or ID...">
+                    <button onclick="searchRegisteredStudents()">Search</button>
                 </div>
             </div>
-
-
         </header>
 
-
+        <!-- TABLE -->
         <table class="styled-table">
             <thead>
                 <tr class="heading">
-                    <th>ID No</th>
-                    <th>Full Name</th>
+                    <th>IDNO</th>
+                    <th>Student Name</th>
                     <th>Course</th>
-                    <th>Year_Level</th>
+                    <th>Year Level</th>
                     <th>Purpose</th>
-                    <th>Laboratory Room</th>
-                    <th>Session</th>
-                    <th>Time-In</th>
-                    <th>Time-Out</th>
-                    <th>Status</th>
+                    <th>Lab</th>
+                    <th>Time In</th>
+                    <th>Date</th>
+                    <th>Remaining Sessions</th>
                     <th>Action</th>
                 </tr>
-            </thead>    
-            <tbody class="userInfo">
-                {% if reservations %}
-                {% for res in reservations %}
-                <tr>
-                    <td style="text-align: center; color: gray;">{{ res.idno }}</td>
-                    <td style="text-align: center; color: gray;">{{ res.student_name }}</td>
-                    <td style="text-align: center; color: gray;">{{ res.course }}</td>
-                    <td style="text-align: center; color: gray;">{{ res.year_level }}</td>
-                    <td style="text-align: center; color: gray;">{{ res.purpose }}</td>
-                    <td style="text-align: center; color: gray;">{{ res.lab }}</td>
-                    <td style="text-align: center; color: gray;">{{ res.time_in }}</td>
-                    <td style="text-align: center; color: gray;">{{ res.date }}</td>
-                    <td style="text-align: center; color: gray;">{{ res.remaining_sessions }}</td>
-                    <td style="text-align: center;" class="
-                        {{ 'accepted' if res.status == 'Accepted' else 
-                        'rejected' if res.status == 'Rejected' else 
-                        'pending' }}">
-                        {{ res.status }}
-                    </td>
-                </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="10" style="text-align: center; color: gray;">No data available</td>
-                </tr>
-            {% endif %}
+            </thead>
+            <tbody id="reservedStudentsTableBody">
+                <!-- Reserved students will be dynamically inserted here -->
             </tbody>
         </table>
-
-
+        
+       
+        <!-- FOOTER | PAGINATION -->
         <footer>
-            <span class="showEntries">Showing 1 to 5 of 6 entries</span>
-                <div class="pagination">
-                <button id="prevButton">Prev</button>
-                <button id="nextButton">Next</button>
+            <div id="pagination">
+                <button id="prevPage" disabled>Previous</button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button id="nextPage">Next</button>
             </div>
         </footer>
+        
+        
     </div>
 
-
-    </div>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="../static/js/admin_sit_in.js"></script>
+
+    
     
 </body>
 </html>

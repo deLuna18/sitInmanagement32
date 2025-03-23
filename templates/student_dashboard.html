@@ -399,6 +399,14 @@
     </div>
 
     <!-- DASHBOARD CONTAINER -->
+
+    {% if session_count <= 5 %}
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle"></i> 
+            You have only {{ session_count }} sessions remaining. Please use them wisely!
+        </div>
+    {% endif %}
+
     <div class="container dashboard-container">
         <div class="card student-info">
             <div class="card-header">
@@ -416,7 +424,7 @@
                     <p><i class="bi bi-book" style="padding: 8px;"></i> <strong>Course:</strong> {{ student.course }}</p>
                     <p><i class="bi bi-calendar" style="padding: 8px;"></i> <strong>Year:</strong> {{ student.year_level }}</p>
                     <p><i class="bi bi-envelope" style="padding: 8px;"></i> <strong>Email:</strong> {{ student.email_address }}</p>
-                    <p><i class="bi bi-clock-history" style="padding: 8px;"></i> <strong>Session:</strong> {{ student.session_count }}</p>
+                    <p><i class="bi bi-clock-history" style="padding: 8px;"></i> <strong>Session:</strong> {{ session_count }}</p>
                 </div>
             </div>
         </div>
