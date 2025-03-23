@@ -1,11 +1,10 @@
 from flask import Flask, render_template, request, redirect, flash, session, make_response, url_for, jsonify
 import dbhelper, os
 
-from dbhelper import get_student_by_username, update_student_profile, is_idno_exists, get_reservation_by_id_or_student, get_all_student_emails, delete_announcement, getprocess, get_all_registered_students, count_all_registered_students, get_admin_student_reservations,get_weekly_enrollment, get_monthly_enrollment, get_yearly_enrollment, count_all_reservations,search_student,get_reserved_students, get_enrolled_students
-
+from dbhelper import get_student_by_username, update_student_profile, is_idno_exists, get_reservation_by_id_or_student, get_all_student_emails, delete_announcement, getprocess, get_all_registered_students, count_all_registered_students, get_admin_student_reservations,get_weekly_enrollment, get_monthly_enrollment, get_yearly_enrollment, count_all_reservations,search_student,get_reserved_students, get_enrolled_students,get_registered_students, count_registered_students, abort
 from werkzeug.utils import secure_filename
 from PIL import Image  
-
+from flask import abort
 
 import smtplib
 from email.mime.text import MIMEText
@@ -687,21 +686,51 @@ def get_total_reservations():
     
 
 
+
+
+
+
 @app.route('/admin_enrolled_students', methods=['GET'])
 def admin_enrolled_students():
-    # Fetch enrolled students based on page and search query
     page = request.args.get('page', 1, type=int)
     per_page = 10
     search_query = request.args.get('search', '', type=str)
 
-    # Get the enrolled students
     students = get_enrolled_students(page, per_page, search_query)
 
-    # Get the total count of enrolled students for pagination
     total_students = count_all_registered_students()
     
-    # Returning data to the template (or as JSON response)
     return render_template('admin_enrolled_students.html', students=students, total_students=total_students)
+
+
+
+
+
+
+# SEARCH REGISTERED STUDENTS 
+@app.route("/search_registered_students", methods=["GET"])
+def search_registered_students():
+    query = request.args.get('query', '').strip().lower()
+    page = request.args.get('page', 1, type=int) 
+    per_page = 10  
+    offset = (page - 1) * per_page  
+
+    if not query:  
+        students = get_all_registered_students(limit=per_page, offset=offset)
+        total_students = count_all_registered_students() 
+    else:  
+        students = get_registered_students(query, limit=per_page, offset=offset)
+        total_students = count_registered_students(query)  
+
+    if not students:  
+        return jsonify({"students": [], "total": 0, "page": page, "per_page": per_page})
+
+    return jsonify({
+        "students": students,
+        "total": total_students,
+        "page": page,
+        "per_page": per_page
+    })
 
 
 if __name__ == "__main__":

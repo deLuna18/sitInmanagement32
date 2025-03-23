@@ -3,6 +3,8 @@ import datetime, pytz
 
 from datetime import datetime, timedelta
 
+from flask import abort
+
 
 database:str = 'usermanagement.db'
 
@@ -371,3 +373,71 @@ def search_student(query: str) -> list:
     '''
     search_term = f"%{query}%"
     return getprocess(sql, (search_term, search_term, search_term, search_term))
+
+
+
+
+
+
+
+
+
+
+
+def count_registered_students(search_query=''):
+    sql = '''
+        SELECT COUNT(*) AS total
+        FROM users
+        WHERE (idno LIKE ?  -- Search by ID number
+           OR firstname LIKE ?  -- Search by first name
+           OR lastname LIKE ?)  -- Search by last name
+           AND idno != ?  -- Exclude admin user
+    '''
+    search_term = f"%{search_query}%"
+    admin_id = "428237351"  # Admin's ID
+    params = (search_term, search_term, search_term, admin_id)
+    result = getprocess(sql, params)
+    return result[0]["total"] if result else 0
+
+def count_all_registered_students():
+    sql = """
+    SELECT COUNT(*) AS total
+    FROM users
+    WHERE idno != ?  -- Exclude admin user
+    """
+    admin_id = "428237351"  # Admin's ID
+    result = getprocess(sql, (admin_id,))
+    return result[0]["total"] if result else 0
+
+
+# GET ALL REGISTERED STUDENTS WITH PAGINATION
+# GET ALL REGISTERED STUDENTS WITH PAGINATION
+def get_all_registered_students(limit=10, offset=0):
+    sql = """
+    SELECT idno, firstname, middlename, lastname, course, year_level, email_address, username
+    FROM users
+    WHERE idno != ?  
+    ORDER BY idno ASC
+    LIMIT ? OFFSET ?
+    """
+    admin_id = "428237351"  
+    return getprocess(sql, (admin_id, limit, offset))
+
+
+
+# GET REGISTERED STUDENTS
+def get_registered_students(search_query='', limit=10, offset=0):
+    sql = '''
+        SELECT idno, firstname, lastname, course, year_level, email_address, username
+        FROM users
+        WHERE (idno LIKE ?  -- Search by ID number
+           OR firstname LIKE ?  -- Search by first name
+           OR lastname LIKE ?)  -- Search by last name
+           AND idno != ?  -- Exclude admin user
+        ORDER BY idno ASC  -- Sort by idno in ascending order
+        LIMIT ? OFFSET ?  -- Add pagination
+    '''
+    search_term = f"%{search_query}%"
+    admin_id = "428237351"  # Admin's ID
+    params = (search_term, search_term, search_term, admin_id, limit, offset)
+    return getprocess(sql, params)

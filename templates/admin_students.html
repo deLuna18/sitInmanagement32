@@ -138,11 +138,12 @@
     </nav>
 		<!-- NAVBAR -->
     
+    <!-- CONTAINER  -->
     <div class="container">
-
+        <!-- HEADER -->
         <header>
-
             <div class="filterEntries">
+                <!-- ENTRIES -->
                 <div class="entries">
                     Show <select name="" id="table_size">
                         <option value="10">10</option>
@@ -152,37 +153,15 @@
                     </select> entries
                 </div>
 
+                <!-- SEARCH BAR -->
                 <div class="search-container">
-                    <input type="text" id="searchInput" placeholder="Search by name, ID, or email (Enrolled Students)">
-                    <button onclick="searchEnrolledStudents()">Search</button>
+                    <input type="text" id="registeredSearchInput" placeholder="Search by name, ID, or email...">
+                    <button onclick="searchRegisteredStudents()">Search</button>
                 </div>
-
-                <script>
-                    // Function to perform search
-                    function searchEnrolledStudents() {
-                        const searchInput = document.getElementById('searchInput').value;
-                        // Reload the page with the search query and reset to page 1
-                        window.location.href = `/admin_students?page=1&search=${encodeURIComponent(searchInput)}`;
-                    }
-                    
-                    // Function to reset the search, remove search query from URL, and reload the page
-                    function resetSearch() {
-                        // Clear the search input field
-                        document.getElementById('searchInput').value = '';
-                        // Reload the page without the search query (i.e., showing all students)
-                        window.location.href = '/admin_students?page=1';  // Reset to the first page with no search
-                    }
-                </script>
             </div>
-
-
-            <div class="addMemberBtn">
-                <button>New member</button>
-            </div>
-
         </header>
 
-
+        <!-- TABLE -->
         <table class="styled-table">
             <thead>
                 <tr class="heading">
@@ -194,60 +173,15 @@
                     <th>Username</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for student in students %}
-                    {% if student.idno != '428237351' %}
-                        <tr>
-                            <td>{{ student.idno }}</td>
-                            <td>{{ student.firstname }} {{ student.lastname }}</td>
-                            <td>{{ student.course }}</td>
-                            <td>{{ student.year_level }}</td>
-                            <td>{{ student.email_address }}</td>
-                            <td>{{ student.username }}</td>
-                        </tr>
-                    {% endif %}
-                {% else %}
-                    <tr>
-                        <td colspan="6">No students found.</td>
-                    </tr>
-                {% endfor %}
+            <tbody id="registeredStudentsTableBody">
+                
             </tbody>
         </table>
         
-
-
+       
+        <!-- FOOTER | PAGINATION -->
         <footer>
-            <div class="pagination" 
-                 style="display: flex; justify-content: center; align-items: center; gap: 20px; padding: 20px 0; width: 100%; text-align: center;">
-                <!-- Previous Button -->
-                {% if page > 1 %}
-                    <a href="{{ url_for('admin_students', page=page-1, search=search_query) }}" 
-                       style="display: flex; justify-content: center; align-items: center; padding: 10px 20px; background-color: #603A7E; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;">
-                        Prev
-                    </a>
-                {% else %}
-                    <span style="display: flex; justify-content: center; align-items: center; padding: 10px 20px; background-color: #e0e0e0; color: #ccc; border-radius: 5px; font-weight: bold;">
-                        Prev
-                    </span>
-                {% endif %}
-        
-                <!-- Page Indicator -->
-                <span style="font-size: 16px; color: #603A7E; font-weight: bold;">
-                    Showing {{ start }} to {{ end }} of {{ total_students }} entries
-                </span>
-        
-                <!-- Next Button -->
-                {% if page < total_pages %}
-                    <a href="{{ url_for('admin_students', page=page+1, search=search_query) }}" 
-                       style="display: flex; justify-content: center; align-items: center; padding: 10px 20px; background-color: #603A7E; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;">
-                        Next
-                    </a>
-                {% else %}
-                    <span style="display: flex; justify-content: center; align-items: center; padding: 10px 20px; background-color: #e0e0e0; color: #ccc; border-radius: 5px; font-weight: bold;">
-                        Next
-                    </span>
-                {% endif %}
-            </div>
+            <div id="pagination"></div>
         </footer>
         
         

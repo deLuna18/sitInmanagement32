@@ -839,22 +839,6 @@ input::-webkit-outer-spin-button{
     box-shadow: 0 0 4px rgba(96, 58, 126, 0.3);
 }
 
-/* Add Member Button */
-header .addMemberBtn button {
-    padding: 10px 16px;
-    color: #ffffff;
-    background: #603A7E;
-    font-size: 14px;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    transition: background 0.3s ease, transform 0.2s ease;
-}
-
-header .addMemberBtn button:hover {
-    background: #2CA58D;
-    transform: scale(1.05);
-}
 
 /* Footer styling */
 .container footer {
@@ -905,16 +889,119 @@ footer .pagination button:disabled {
 }
 
 
-nav .form-group .search-btn {
-    background: var(--blue); 
-    color: #fff; 
-    border: none;
-    border-radius: 5px;
-    padding: 10px 16px;
-    cursor: pointer;
-    transition: background .3s ease;
+
+/* BOTTOM SEARCH BAR */
+.filterEntries .search-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-nav .form-group .search-btn:hover {
-    background: #603a7ede; 
+.filterEntries .search-container input {
+    width: 100%;
+    max-width: 300px;
+    padding: 10px 16px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    outline: none;
+    font-size: 14px;
+    color: #333333;
+    background: #f9f9f9;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.filterEntries .search-container input:focus {
+    border-color: #603A7E;
+    box-shadow: 0 0 4px rgba(96, 58, 126, 0.3);
+}
+
+.filterEntries .search-container button {
+    padding: 10px 16px;
+    background: #603A7E;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.filterEntries .search-container button:hover {
+    background: #4a2c5f;
+    transform: scale(1.05);
+}
+
+/* FILTER ENTRIES CONTAINER */
+.filterEntries {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 20px; /* Add gap between entries dropdown and search bar */
+}
+
+/* ENTRIES DROPDOWN */
+.filterEntries .entries {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Add gap between "Show" text and dropdown */
+    color: #333333;
+    font-size: 14px;
+}
+
+.filterEntries .entries select {
+    padding: 8px 12px;
+    border: 1px solid #cccccc;
+    color: #333333;
+    background: #f9f9f9;
+    border-radius: 5px;
+    outline: none;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.filterEntries .entries select:hover {
+    border-color: #603A7E;
+}
+
+/* SEARCH CONTAINER */
+.filterEntries .search-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto; /* Push search bar to the right */
+}
+
+.filterEntries .search-container input {
+    width: 100%;
+    max-width: 300px;
+    padding: 10px 16px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    outline: none;
+    font-size: 14px;
+    color: #333333;
+    background: #f9f9f9;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.filterEntries .search-container input:focus {
+    border-color: #603A7E;
+    box-shadow: 0 0 4px rgba(96, 58, 126, 0.3);
+}
+
+.filterEntries .search-container button {
+    padding: 10px 16px;
+    background: #603A7E;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.filterEntries .search-container button:hover {
+    background: #4a2c5f;
+    transform: scale(1.05);
 }
