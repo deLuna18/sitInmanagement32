@@ -231,7 +231,7 @@ nav form {
 nav .form-group {
 	position: relative;
 	display: flex;
-    align-items: center; /* Align items vertically */
+    align-items: center; 
     gap: 5px;
 }
 

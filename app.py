@@ -712,7 +712,7 @@ def admin_enrolled_students():
 def search_registered_students():
     query = request.args.get('query', '').strip().lower()
     page = request.args.get('page', 1, type=int) 
-    per_page = 10  
+    per_page = request.args.get('per_page', 10, type=int)  # Get per_page from the request
     offset = (page - 1) * per_page  
 
     if not query:  
@@ -731,7 +731,6 @@ def search_registered_students():
         "page": page,
         "per_page": per_page
     })
-
 
 if __name__ == "__main__":
     app.run(debug=True)

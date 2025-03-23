@@ -95,48 +95,103 @@
     <!-- SIDEBAR -->
 
     <section id="content">
-		<!-- NAVBAR -->
-    <nav>
-        <i class='bx bx-menu toggle-sidebar'></i>
+	
+        <!-- NAVBAR [SUD KAY SEARCH BAR]-->
+		<nav>
+			<i class='bx bx-menu toggle-sidebar'></i>
+			<form id="searchForm">
+				<div class="form-group">
+					<input type="text" id="searchInput" placeholder="Search by ID or Last Name...">
+					<button type="button" id="searchBtn" class="search-btn">Search</button>
+				</div>
+			</form>
+		</nav>
+		
+		<button id="openModalBtn" style="display: none;">Open Sit-In Modal</button>
 
-     
+		<!-- MODAL FOR STUDENT SIT-IN [CONNECTED TO SEARCH BAR] -->
+		<div id="sitInModal" 
+			style="
+				display: none;
+				position: fixed; 
+				top: 0; 
+				left: 0; 
+				width: 100%; 
+				height: 100%; 
+				background-color: rgba(0, 0, 0, 0.5); 
+				z-index: 9999; /* Highest priority */
+				justify-content: center; 
+				align-items: center;
+				
+				
 
-        <!-- Modal for Student Sit-In [Connected to Search Bar] -->
-        <div id="sitInModal" 
-            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; justify-content: center; align-items: center;">
-            <div class="modal-content" 
-                style="background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); width: 100%; max-width: 500px;">
-                <h2>Sit In Form</h2>
-                <label>ID Number:</label>
-                <input type="text" id="idNumber" readonly>
+				">
 
-                <label>Student Name:</label>
-                <input type="text" id="studentName" readonly>
+			<div class="modal-content" 
+				style="
+					
+					background-color: #fff; 
+					padding: 20px; 
+					border-radius: 10px; 
+					box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); 
+					width: 100%; 
+					max-width: 500px;
+					">
+					
+					
+				<h2>Sit In Form</h2>
+			
+				<label>ID Number:</label>
+				<input type="text" id="idNumber" readonly>
 
-                <label>Purpose:</label>
-                <input type="text" id="purpose" readonly>
+				<label>Student Name:</label>
+				<input type="text" id="studentName" readonly>
 
-                <label>Lab:</label>
-                <input type="text" id="lab" readonly>
+				<label>Purpose:</label>
+				<input type="text" id="purpose" readonly>
 
-                <label>Remaining Sessions:</label>
-                <input type="text" id="remainingSessions" readonly>
+				<label>Lab:</label>
+				<input type="text" id="lab" readonly>
 
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button id="closeModal" style="background-color: #d9534f; color: #fff; border: none; border-radius: 5px; padding: 8px 20px; cursor: pointer; transition: background 0.3s ease;">
-                        Close
-                    </button>
-                    <button id="acceptBtn" style="background-color: #5cb85c; color: #fff; border: none; border-radius: 5px; padding: 8px 20px; cursor: pointer; transition: background 0.3s ease;">
-                        Accept
-                    </button>
-                    <button id="rejectBtn" style="background-color: #f0ad4e; color: #fff; border: none; border-radius: 5px; padding: 8px 20px; cursor: pointer; transition: background 0.3s ease;">
-                        Reject
-                    </button>
-                </div>
-            </div>
-        </div>
-    </nav>
-		<!-- NAVBAR -->
+				<label>Remaining Sessions:</label>
+				<input type="text" id="remainingSessions" readonly>
+
+				<div style="display: flex; gap: 10px; margin-top: 10px;">
+					<button id="closeModal" style="
+						background-color: #d9534f; 
+						color: #fff; 
+						border: none; 
+						border-radius: 5px; 
+						padding: 8px 20px; 
+						cursor: pointer;
+						transition: background 0.3s ease;">
+						Close
+					</button>
+				
+					<button id="acceptBtn" style="
+						background-color: #5cb85c; 
+						color: #fff; 
+						border: none; 
+						border-radius: 5px; 
+						padding: 8px 20px; 
+						cursor: pointer;
+						transition: background 0.3s ease;">
+						Accept
+					</button>
+				
+					<button id="rejectBtn" style="
+						background-color: #f0ad4e; 
+						color: #fff; 
+						border: none; 
+						border-radius: 5px; 
+						padding: 8px 20px; 
+						cursor: pointer;
+						transition: background 0.3s ease;">
+						Reject
+					</button>
+				</div>
+			</div>
+		</div>
     
     <!-- CONTAINER  -->
     <div class="container">
@@ -145,17 +200,19 @@
             <div class="filterEntries">
                 <!-- ENTRIES -->
                 <div class="entries">
-                    Show <select name="" id="table_size">
+                    Show 
+                    <select name="" id="table_size">
+                        <option value="5">5</option>
                         <option value="10">10</option>
                         <option value="20">20</option>
                         <option value="50">50</option>
                         <option value="100">100</option>
                     </select> entries
                 </div>
-
+            
                 <!-- SEARCH BAR -->
                 <div class="search-container">
-                    <input type="text" id="registeredSearchInput" placeholder="Search by name, ID, or email...">
+                    <input type="text" id="registeredSearchInput" placeholder="Search by name or ID...">
                     <button onclick="searchRegisteredStudents()">Search</button>
                 </div>
             </div>
@@ -165,6 +222,7 @@
         <table class="styled-table">
             <thead>
                 <tr class="heading">
+                    <th>Profile</th>
                     <th>ID No</th>
                     <th>Full Name</th>
                     <th>Course</th>
@@ -181,7 +239,13 @@
        
         <!-- FOOTER | PAGINATION -->
         <footer>
-            <div id="pagination"></div>
+            <div id="pagination">
+                <button id="prevPage" disabled>Previous</button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button id="nextPage">Next</button>
+            </div>
         </footer>
         
         

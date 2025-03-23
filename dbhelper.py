@@ -414,7 +414,7 @@ def count_all_registered_students():
 # GET ALL REGISTERED STUDENTS WITH PAGINATION
 def get_all_registered_students(limit=10, offset=0):
     sql = """
-    SELECT idno, firstname, middlename, lastname, course, year_level, email_address, username
+    SELECT idno, firstname, middlename, lastname, course, year_level, email_address, username, profile_picture
     FROM users
     WHERE idno != ?  
     ORDER BY idno ASC
