@@ -658,139 +658,43 @@ def admin_sit_in():
     students = dbhelper.get_all_reservations_paginated(per_page=10, offset=0)
     return render_template("admin_sit_in.html", students=students)
 
-# RESERVED STUDENTS
-@app.route("/api/reserved_students")
-def api_reserved_students():
-    if "user" not in session or not dbhelper.is_admin(session["user"]):
-        return jsonify({"error": "Unauthorized"}), 403
-    
-    page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 10, type=int)
-    offset = (page - 1) * per_page
-
-    students = dbhelper.get_all_reservations_paginated(per_page, offset)
-    total_students = dbhelper.count_all_reservations()
-
-    return jsonify({
-        "students": students,
-        "total_students": total_students,
-        "page": page,
-        "per_page": per_page
-    })
-
-# SEARCH RESERVED STUDENTS
-@app.route("/search_reserved_students")
-def search_reserved_students():
-    if "user" not in session or not dbhelper.is_admin(session["user"]):
-        return redirect("/login")
-    
-    query = request.args.get("query", "").strip()
-    page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 10, type=int)
-    offset = (page - 1) * per_page
-
-    students = dbhelper.get_reservation_by_id_or_student(query)
-    total_students = len(students)
-
-    return jsonify({
-        "students": students,
-        "total": total_students,
-        "page": page,
-        "per_page": per_page
-    })
-
-# ACCEPT RESERVATION
-# ACCEPT RESERVATION
-@app.route("/accept_reservation", methods=["POST"])
-def accept_reservation():
+@app.route('/sit-in/record', methods=['POST'])
+def record_sit_in():
     try:
-        if "user" not in session or not dbhelper.is_admin(session["user"]):
-            return jsonify({"error": "Unauthorized"}), 403
+        data = request.get_json()
+        
+        # Get current time in Philippine timezone
+        ph_tz = pytz.timezone('Asia/Manila')
+        sit_in_time = datetime.now(ph_tz).strftime('%Y-%m-%d %H:%M:%S')
 
-        idno = request.form.get("idno")
-        if not idno:
-            return jsonify({"error": "ID number is required"}), 400
-
-        print(f"Fetching reservation for ID: {idno}")  # Debugging
-        reservation = dbhelper.get_reservation_by_id(idno)
-        if not reservation:
-            print("Reservation not found")  # Debugging
-            return jsonify({"error": "Reservation not found"}), 404
-
-        remaining_sessions = reservation.get("remaining_sessions", 30)
-        print(f"Remaining sessions: {remaining_sessions}")  # Debugging
-
-        print("Updating reservation status and sessions")  # Debugging
-        success = dbhelper.update_reservation_status_and_sessions(idno, "Accepted", remaining_sessions - 1)
-
-        if success:
-            print("Fetching user details")  # Debugging
-            user = dbhelper.get_user_by_idno(idno)
-            if user:
-                current_sessions = user.get("sessions", 30)
-                print(f"Current sessions: {current_sessions}")  # Debugging
-                print("Updating user sessions")  # Debugging
-                dbhelper.update_user_sessions(idno, current_sessions - 1)
-
-            return jsonify({"message": "Reservation accepted successfully!", "idno": idno})  # Return the IDNO
-        else:
-            print("Failed to update reservation")  # Debugging
-            return jsonify({"error": "Failed to accept reservation"}), 500
+        # Insert record
+        success = dbhelper.create_sit_in(
+            student_id=data['student_id'],
+            student_name=data['student_name'],
+            course=data['course'],
+            year_level=data['year_level'],
+            lab=data['lab'],
+            purpose=data['purpose'],
+            processed_by=session.get('username', 'admin'),
+            sit_in_time=sit_in_time
+        )
+        
+        if not success:
+            return jsonify({
+                'success': False,
+                'message': 'Database operation failed'
+            }), 500
+            
+        return jsonify({'success': True})
     except Exception as e:
-        print(f"Error in /accept_reservation: {e}")  # Debugging
-        return jsonify({"error": "Internal server error"}), 500
-
-# REJECT RESERVATION
-@app.route("/reject_reservation", methods=["POST"])
-def reject_reservation():
-    try:
-        if "user" not in session or not dbhelper.is_admin(session["user"]):
-            return jsonify({"error": "Unauthorized"}), 403
-
-        idno = request.form.get("idno")
-        if not idno:
-            return jsonify({"error": "ID number is required"}), 400
-
-        print(f"Fetching reservation for ID: {idno}")  # Debugging
-        reservation = dbhelper.get_reservation_by_id(idno)
-        if not reservation:
-            print("Reservation not found")  # Debugging
-            return jsonify({"error": "Reservation not found"}), 404
-
-        remaining_sessions = reservation.get("remaining_sessions", 30)
-        print(f"Remaining sessions: {remaining_sessions}")  # Debugging
-
-        print("Updating reservation status and sessions")  # Debugging
-        success = dbhelper.update_reservation_status_and_sessions(idno, "Rejected", remaining_sessions)
-
-        if success:
-            return jsonify({"message": "Reservation rejected successfully!", "idno": idno})  # Return the IDNO
-        else:
-            print("Failed to update reservation")  # Debugging
-            return jsonify({"error": "Failed to reject reservation"}), 500
-    except Exception as e:
-        print(f"Error in /reject_reservation: {e}")  # Debugging
-        return jsonify({"error": "Internal server error"}), 500
-
-# RESET SESSION
-@app.route("/reset_sessions", methods=["POST"])
-def reset_sessions():
-    if "user" not in session or not dbhelper.is_admin(session["user"]):
-        return jsonify({"error": "Unauthorized"}), 403
-
-    idno = request.form.get("idno")
-    if not idno:
-        return jsonify({"error": "ID number is required"}), 400
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
     
-    default_sessions = 30
-
-    success_users = dbhelper.update_user_sessions(idno, default_sessions)
-    success_reservations = dbhelper.update_reservation_sessions(idno, default_sessions)
-
-    if success_users and success_reservations:
-        return jsonify({"message": "Sessions reset successfully!"})
-    else:
-        return jsonify({"error": "Failed to reset sessions"}), 500
+    except Exception as e:
+        print(f"Error recording sit-in: {e}")
+        return jsonify({'success': False}), 500
 
 # ====================== VIEW SIT RECORD ================
 @app.route("/view_sit_record")

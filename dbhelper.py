@@ -505,11 +505,10 @@ def get_enrolled_students(page, per_page, search_query=''):
     return getprocess(sql, params)
 
 
-# SESSION
-def get_student_session_count(idno: int) -> int:
-    sql = "SELECT remaining_sessions FROM reservations WHERE idno = ? ORDER BY date DESC LIMIT 1"
-    result = getprocess(sql, (idno,))
-    
-    if result:
-        return result[0].get("remaining_sessions", 30)  # Default to 30 if no sessions found
-    return 30  # Default value if no reservations exist
+# CREATE SIT-IN RECORD
+def create_sit_in(student_id, student_name, course, year_level, lab, purpose, processed_by, sit_in_time):
+    sql = """INSERT INTO sit_ins 
+             (student_id, student_name, course, year_level, lab, purpose, processed_by, sit_in_time)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"""
+    return postprocess(sql, (student_id, student_name, course, year_level, lab, purpose, processed_by, sit_in_time))
+
