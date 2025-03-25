@@ -204,7 +204,7 @@ function displayRegisteredStudents(students) {
             <td>
                 <button class="btn btn-primary btn-sm sit-in-btn"
                         data-id="${student.idno}">
-                    <i class="fas fa-chair"></i> Sit In
+                    <i class=""></i> Sit In
                 </button>
             </td>
         `;
